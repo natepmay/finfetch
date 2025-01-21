@@ -5,6 +5,7 @@ import { Transaction } from "npm:plaid";
  *  our application cares about from the Plaid transaction endpoint
  */
 export class SimpleTransaction {
+  [key: string]: unknown;
   constructor(
     public id: string,
     public accountId: string,

@@ -7,6 +7,7 @@ import {
   Transaction,
 } from "npm:plaid";
 import { SimpleTransaction } from "./simpleTransactionObject.ts";
+import { stringify } from "jsr:@std/csv";
 
 const app = express();
 const port = 3002;
@@ -92,7 +93,7 @@ async function fetchNewSyncData(
         error
       )} Let's try again from the beginning!`
     );
-    await setTimeout(() => {}, 1000);
+    setTimeout(() => {}, 1000);
     return fetchNewSyncData(accessToken, initialCursor, retriesLeft - 1);
   }
 }
@@ -109,18 +110,19 @@ async function syncTransactions(itemId: string) {
   const rawData = await fetchNewSyncData(accessToken, "");
 
   const simpleData = {
-    added: [] as SimpleTransaction[],
-    removed: [] as RemovedTransaction[],
-    modified: [] as SimpleTransaction[],
-    nextCursor: "",
+    added: simplifyTransactions(rawData.added),
+    removed: rawData.removed,
+    modified: simplifyTransactions(rawData.modified),
+    nextCursor: rawData.nextCursor,
   };
 
-  // TODO Is there an Object.map or something?
+  const csvString = stringify(simpleData.added, {
+    columns: Object.keys(simpleData.added[0]),
+  });
 
-  simpleData.added = simplifyTransactions(rawData.added);
-  simpleData.modified = simplifyTransactions(rawData.modified);
-  simpleData.removed = rawData.removed;
-  simpleData.nextCursor = rawData.nextCursor;
+  console.log(csvString);
+
+  await Deno.writeTextFile("./out/one.csv", csvString);
 
   return simpleData;
 }

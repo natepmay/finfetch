@@ -2,7 +2,9 @@
   "version": "4",
   "specifiers": {
     "jsr:@std/assert@1": "1.0.8",
+    "jsr:@std/csv@*": "1.0.3",
     "jsr:@std/internal@^1.0.5": "1.0.5",
+    "jsr:@std/streams@^1.0.4": "1.0.8",
     "npm:express@*": "4.21.1",
     "npm:plaid@*": "30.0.0"
   },
@@ -13,8 +15,17 @@
         "jsr:@std/internal"
       ]
     },
+    "@std/csv@1.0.3": {
+      "integrity": "623acf0dcb88d62ba727c3611ad005df7f109ede8cac833e3986f540744562e5",
+      "dependencies": [
+        "jsr:@std/streams"
+      ]
+    },
     "@std/internal@1.0.5": {
       "integrity": "54a546004f769c1ac9e025abd15a76b6671ddc9687e2313b67376125650dc7ba"
+    },
+    "@std/streams@1.0.8": {
+      "integrity": "b41332d93d2cf6a82fe4ac2153b930adf1a859392931e2a19d9fabfb6f154fb3"
     }
   },
   "npm": {
