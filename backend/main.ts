@@ -1,5 +1,13 @@
 import express from "npm:express";
-import { Configuration, PlaidApi, PlaidEnvironments } from "npm:plaid";
+import {
+  Configuration,
+  PlaidApi,
+  PlaidEnvironments,
+  RemovedTransaction,
+  Transaction,
+} from "npm:plaid";
+import { SimpleTransaction } from "./simpleTransactionObject.ts";
+
 const app = express();
 const port = 3002;
 
@@ -20,20 +28,71 @@ const configuration = new Configuration({
 
 const client = new PlaidApi(configuration);
 
-app.get("/", (_: express.Request, res: express.Response) => {
-  res.send({ jsony: "moree stuff" });
-});
-
 app.post("/api/sync", async (_: express.Request, res: express.Response) => {
-  const request = {
-    access_token: ACCESS_TOKEN,
-    cursor: undefined,
-  };
-  const response = await client.transactionsSync(request);
-  const data = response.data;
+  const data = await fetchNewSyncData(ACCESS_TOKEN, "");
   res.json(data);
 });
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
+
+const fetchNewSyncData = async function (
+  accessToken: string,
+  initialCursor: string,
+  retriesLeft = 3
+) {
+  const allData = {
+    added: [] as Transaction[],
+    removed: [] as RemovedTransaction[],
+    modified: [] as Transaction[],
+    nextCursor: initialCursor,
+  };
+  if (retriesLeft <= 0) {
+    console.error("Too many retries!");
+    // We're just going to return no data and keep our original cursor. We can try again later.
+    return allData;
+  }
+  try {
+    let keepGoing = false;
+    do {
+      const results = await client.transactionsSync({
+        access_token: accessToken,
+        options: {
+          include_personal_finance_category: true,
+        },
+        cursor: allData.nextCursor,
+      });
+      const newData = results.data;
+      allData.added = allData.added.concat(newData.added);
+      allData.modified = allData.modified.concat(newData.modified);
+      allData.removed = allData.removed.concat(newData.removed);
+      allData.nextCursor = newData.next_cursor;
+      keepGoing = newData.has_more;
+      console.log(
+        `Added: ${newData.added.length} Modified: ${newData.modified.length} Removed: ${newData.removed.length} `
+      );
+
+      // if (Math.random() < 0.5) {
+      //   throw new Error("SIMULATED PLAID SYNC ERROR");
+      // }
+    } while (keepGoing === true);
+    return allData;
+  } catch (error) {
+    // If you want to see if this is a sync mutation error, you can look at
+    // error?.response?.data?.error_code
+    console.log(
+      `Oh no! Error! ${JSON.stringify(
+        error
+      )} Let's try again from the beginning!`
+    );
+    await setTimeout(() => {}, 1000);
+    return fetchNewSyncData(accessToken, initialCursor, retriesLeft - 1);
+  }
+};
+
+const simplifyTransactions = (transactions: Transaction[]) => {
+  transactions.map((transaction: Transaction) => {
+    return SimpleTransaction.fromPlaidTransaction(transaction);
+  });
+};
