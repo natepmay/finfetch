@@ -14,6 +14,12 @@ const port = 3002;
 const PLAID_CLIENT_ID = "678c42d1e54ee60025166d12";
 const PLAID_SECRET = "5446e8b0ba7593997ef974bf4c7f08";
 const ACCESS_TOKEN = "access-sandbox-e13f4d99-6f6d-482f-967d-887d853240dd";
+const ITEMS = [
+  {
+    id: "one",
+    accessToken: "access-sandbox-e13f4d99-6f6d-482f-967d-887d853240dd",
+  },
+];
 
 const configuration = new Configuration({
   basePath: PlaidEnvironments.sandbox,
@@ -29,15 +35,15 @@ const configuration = new Configuration({
 const client = new PlaidApi(configuration);
 
 app.post("/api/sync", async (_: express.Request, res: express.Response) => {
-  const data = await fetchNewSyncData(ACCESS_TOKEN, "");
-  res.json(data);
+  const simpleData = await syncTransactions("one");
+  res.json(simpleData);
 });
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
 
-const fetchNewSyncData = async function (
+async function fetchNewSyncData(
   accessToken: string,
   initialCursor: string,
   retriesLeft = 3
@@ -89,10 +95,32 @@ const fetchNewSyncData = async function (
     await setTimeout(() => {}, 1000);
     return fetchNewSyncData(accessToken, initialCursor, retriesLeft - 1);
   }
-};
+}
 
-const simplifyTransactions = (transactions: Transaction[]) => {
-  transactions.map((transaction: Transaction) => {
-    return SimpleTransaction.fromPlaidTransaction(transaction);
-  });
-};
+async function syncTransactions(itemId: string) {
+  const simplifyTransactions = (transactions: Transaction[]) => {
+    return transactions.map((transaction: Transaction) => {
+      return SimpleTransaction.fromPlaidTransaction(transaction);
+    });
+  };
+
+  const { accessToken } = ITEMS.find((x) => x.id === itemId)!;
+
+  const rawData = await fetchNewSyncData(accessToken, "");
+
+  const simpleData = {
+    added: [] as SimpleTransaction[],
+    removed: [] as RemovedTransaction[],
+    modified: [] as SimpleTransaction[],
+    nextCursor: "",
+  };
+
+  // TODO Is there an Object.map or something?
+
+  simpleData.added = simplifyTransactions(rawData.added);
+  simpleData.modified = simplifyTransactions(rawData.modified);
+  simpleData.removed = rawData.removed;
+  simpleData.nextCursor = rawData.nextCursor;
+
+  return simpleData;
+}
