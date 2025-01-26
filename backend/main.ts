@@ -8,13 +8,18 @@ import {
 } from "npm:plaid";
 import { SimpleTransaction } from "./simpleTransactionObject.ts";
 import { stringify } from "jsr:@std/csv";
+import { DB } from "https://deno.land/x/sqlite/mod.ts";
 
 const app = express();
 const port = 3002;
 
+const db = new DB("db.db");
+
+// TODO put these in .env (also regenerate)
 const PLAID_CLIENT_ID = "678c42d1e54ee60025166d12";
 const PLAID_SECRET = "5446e8b0ba7593997ef974bf4c7f08";
-const ACCESS_TOKEN = "access-sandbox-e13f4d99-6f6d-482f-967d-887d853240dd";
+
+// TODO replace with call to db
 const ITEMS = [
   {
     id: "one",
@@ -122,7 +127,9 @@ async function syncTransactions(itemId: string) {
 
   console.log(csvString);
 
-  await Deno.writeTextFile("./out/one.csv", csvString);
+  await Deno.writeTextFile("./out/added.csv", csvString);
+  // TODO support removed (maybe just reverse the transaction?), modified
+  // explore the import in hledger to see what would make sense as default
 
   return simpleData;
 }
