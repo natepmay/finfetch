@@ -11,7 +11,7 @@ import {
 import { SimpleTransaction } from "./simpleTransactionObject.ts";
 import { stringify } from "jsr:@std/csv";
 import { DB } from "https://deno.land/x/sqlite/mod.ts";
-import { initDb, queryDb } from "./db.ts";
+import { initDb, queryDb, addItem } from "./db.ts";
 import "jsr:@std/dotenv/load";
 
 const app = express();
@@ -71,6 +71,31 @@ app.post(
     try {
       const createTokenResponse = await client.linkTokenCreate(configs);
       res.json(createTokenResponse.data);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+app.post(
+  "/api/create_access_token",
+  async function (
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) {
+    // lower snake case for request?
+    const publicToken = req.body.publicToken;
+    try {
+      const tokenResponse = await client.itemPublicTokenExchange({
+        public_token: publicToken,
+      });
+      const { access_token, item_id } = tokenResponse.data;
+      addItem(db, { access_token, item_id });
+      // Don't return the access token to the client for security reasons
+      res.json({
+        item_id,
+      });
     } catch (error) {
       next(error);
     }

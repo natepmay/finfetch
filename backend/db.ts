@@ -57,6 +57,17 @@ export function initDb(db: DB) {
   }
 }
 
+export function addItem(
+  db: DB,
+  item: { item_id: string; access_token: string; name?: string }
+) {
+  db.query("INSERT INTO items (item_id, access_token, name) VALUES(?, ?, ?)", [
+    item.item_id,
+    item.access_token,
+    item.name ?? null,
+  ]);
+}
+
 export function queryDb(db: DB) {
   const results = [];
   for (const [name, itemId, accessToken] of db.query(
