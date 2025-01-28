@@ -5,6 +5,8 @@ import {
   PlaidEnvironments,
   RemovedTransaction,
   Transaction,
+  CountryCode,
+  Products,
 } from "npm:plaid";
 import { SimpleTransaction } from "./simpleTransactionObject.ts";
 import { stringify } from "jsr:@std/csv";
@@ -21,9 +23,14 @@ initDb(db);
 
 const PLAID_CLIENT_ID = Deno.env.get("PLAID_CLIENT_ID");
 const PLAID_SECRET = Deno.env.get("PLAID_SECRET");
+const PLAID_ENV = Deno.env.get("PLAID_ENV");
+const PLAID_COUNTRY_CODES = Deno.env
+  .get("PLAID_COUNTRY_CODES")
+  ?.split(",") as CountryCode[];
+const PLAID_PRODUCTS = Deno.env.get("PLAID_PRODUCTS")?.split(",") as Products[];
 
 const configuration = new Configuration({
-  basePath: PlaidEnvironments.sandbox,
+  basePath: PlaidEnvironments[PLAID_ENV!],
   baseOptions: {
     headers: {
       "PLAID-CLIENT-ID": PLAID_CLIENT_ID,
@@ -43,6 +50,32 @@ app.post("/api/sync", async (_: express.Request, res: express.Response) => {
   }
   res.json(itemResults);
 });
+
+app.post(
+  "/api/create_link_token",
+  async function (
+    _: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) {
+    const configs = {
+      user: {
+        // currently hardcoded as "1" with the assumption of only one user
+        client_user_id: "1",
+      },
+      client_name: "Finfetch",
+      products: PLAID_PRODUCTS,
+      country_codes: PLAID_COUNTRY_CODES,
+      language: "en",
+    };
+    try {
+      const createTokenResponse = await client.linkTokenCreate(configs);
+      res.json(createTokenResponse.data);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
