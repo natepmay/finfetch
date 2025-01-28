@@ -9,23 +9,18 @@ import {
 import { SimpleTransaction } from "./simpleTransactionObject.ts";
 import { stringify } from "jsr:@std/csv";
 import { DB } from "https://deno.land/x/sqlite/mod.ts";
+import { initDb, queryDb } from "./db.ts";
 
 const app = express();
 const port = 3002;
 
 const db = new DB("db.db");
+initDb(db);
+// TODO don't forget to close the db later
 
 // TODO put these in .env (also regenerate)
 const PLAID_CLIENT_ID = "678c42d1e54ee60025166d12";
 const PLAID_SECRET = "5446e8b0ba7593997ef974bf4c7f08";
-
-// TODO replace with call to db
-const ITEMS = [
-  {
-    id: "one",
-    accessToken: "access-sandbox-e13f4d99-6f6d-482f-967d-887d853240dd",
-  },
-];
 
 const configuration = new Configuration({
   basePath: PlaidEnvironments.sandbox,
@@ -41,8 +36,12 @@ const configuration = new Configuration({
 const client = new PlaidApi(configuration);
 
 app.post("/api/sync", async (_: express.Request, res: express.Response) => {
-  const simpleData = await syncTransactions("one");
-  res.json(simpleData);
+  const items = queryDb(db);
+  const itemResults = [];
+  for (const item of items) {
+    itemResults.push(await syncTransactions(item));
+  }
+  res.json(itemResults);
 });
 
 app.listen(port, () => {
@@ -103,22 +102,25 @@ async function fetchNewSyncData(
   }
 }
 
-async function syncTransactions(itemId: string) {
+async function syncTransactions(item: {
+  name: string;
+  itemId: string;
+  accessToken: string;
+}) {
   const simplifyTransactions = (transactions: Transaction[]) => {
     return transactions.map((transaction: Transaction) => {
       return SimpleTransaction.fromPlaidTransaction(transaction);
     });
   };
 
-  const { accessToken } = ITEMS.find((x) => x.id === itemId)!;
-
-  const rawData = await fetchNewSyncData(accessToken, "");
+  const rawData = await fetchNewSyncData(item.accessToken, "");
 
   const simpleData = {
     added: simplifyTransactions(rawData.added),
     removed: rawData.removed,
     modified: simplifyTransactions(rawData.modified),
     nextCursor: rawData.nextCursor,
+    itemName: item.name,
   };
 
   const csvString = stringify(simpleData.added, {

@@ -58,7 +58,15 @@ export function initDb(db: DB) {
 }
 
 export function queryDb(db: DB) {
-  for (const [name] of db.query("SELECT name FROM items")) {
-    console.log(name);
+  const results = [];
+  for (const [name, itemId, accessToken] of db.query(
+    "SELECT name, item_id as itemId, access_token as accessToken FROM items"
+  ) as Iterable<[string, string, string]>) {
+    results.push({
+      name,
+      itemId,
+      accessToken,
+    });
   }
+  return results;
 }
