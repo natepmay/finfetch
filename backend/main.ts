@@ -10,6 +10,7 @@ import { SimpleTransaction } from "./simpleTransactionObject.ts";
 import { stringify } from "jsr:@std/csv";
 import { DB } from "https://deno.land/x/sqlite/mod.ts";
 import { initDb, queryDb } from "./db.ts";
+import "jsr:@std/dotenv/load";
 
 const app = express();
 const port = 3002;
@@ -18,9 +19,8 @@ const db = new DB("db.db");
 initDb(db);
 // TODO don't forget to close the db later
 
-// TODO put these in .env (also regenerate)
-const PLAID_CLIENT_ID = "678c42d1e54ee60025166d12";
-const PLAID_SECRET = "5446e8b0ba7593997ef974bf4c7f08";
+const PLAID_CLIENT_ID = Deno.env.get("PLAID_CLIENT_ID");
+const PLAID_SECRET = Deno.env.get("PLAID_SECRET");
 
 const configuration = new Configuration({
   basePath: PlaidEnvironments.sandbox,
