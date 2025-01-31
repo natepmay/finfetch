@@ -22,7 +22,11 @@ export function ItemCardArea() {
   }, []);
 
   const itemCards = items.map((item) => (
-    <ItemCard itemName={item.name} key={item.itemId}></ItemCard>
+    <ItemCard
+      itemName={item.name}
+      key={item.itemId}
+      itemId={item.itemId}
+    ></ItemCard>
   ));
 
   return (

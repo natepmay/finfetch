@@ -102,3 +102,21 @@ export function getItems(db: DB) {
   }
   return results;
 }
+
+export function getAccounts(db: DB, itemId: string) {
+  const results = [];
+  for (const [name, nickname, accountId] of db.query(
+    `
+    SELECT name, nickname, account_id as accountId FROM accounts
+    WHERE item_id = ?
+    `,
+    [itemId]
+  ) as Iterable<[string, string, string]>) {
+    results.push({
+      name,
+      nickname,
+      accountId,
+    });
+  }
+  return results;
+}

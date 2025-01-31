@@ -13,7 +13,7 @@ import {
 import { SimpleTransaction } from "./simpleTransactionObject.ts";
 import { stringify } from "jsr:@std/csv";
 import { DB } from "https://deno.land/x/sqlite/mod.ts";
-import { initDb, getItems, addItem, addAccount } from "./db.ts";
+import { initDb, getItems, addItem, addAccount, getAccounts } from "./db.ts";
 import { PlaidLinkOnSuccessMetadata } from "./types.ts";
 import "jsr:@std/dotenv/load";
 
@@ -96,6 +96,15 @@ app.get("/api/getItems", function (_: express.Request, res: express.Response) {
   }));
   res.json(itemsFrontend);
 });
+
+app.get(
+  "/api/getAccounts",
+  function (req: express.Request, res: express.Response) {
+    const itemId: string = req.query.itemId;
+    const accounts = getAccounts(db, itemId);
+    res.json(accounts);
+  }
+);
 
 app.post(
   "/api/create_access_token",
