@@ -13,7 +13,7 @@ import {
 import { SimpleTransaction } from "./simpleTransactionObject.ts";
 import { stringify } from "jsr:@std/csv";
 import { DB } from "https://deno.land/x/sqlite/mod.ts";
-import { initDb, queryDb, addItem, addAccount } from "./db.ts";
+import { initDb, getItems, addItem, addAccount } from "./db.ts";
 import { PlaidLinkOnSuccessMetadata } from "./types.ts";
 import "jsr:@std/dotenv/load";
 
@@ -53,7 +53,7 @@ const configuration = new Configuration({
 const client = new PlaidApi(configuration);
 
 app.post("/api/sync", async (_: express.Request, res: express.Response) => {
-  const items = queryDb(db);
+  const items = getItems(db);
   const itemResults = [];
   for (const item of items) {
     itemResults.push(await syncTransactions(item));
@@ -87,6 +87,15 @@ app.post(
     }
   }
 );
+
+app.get("/api/getItems", function (_: express.Request, res: express.Response) {
+  const items = getItems(db);
+  const itemsFrontend = items.map((item) => ({
+    itemId: item.itemId,
+    name: item.name,
+  }));
+  res.json(itemsFrontend);
+});
 
 app.post(
   "/api/create_access_token",

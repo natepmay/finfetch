@@ -7,6 +7,7 @@ const BASE_BACKEND_URL = "http://localhost:3002";
 export function AddItemButtonArea() {
   const [token, setToken] = useState<string | null>(null);
   useEffect(() => {
+    // TODO move this function to data.ts
     const createLinkToken = async () => {
       const response = await fetch(
         BASE_BACKEND_URL + "/api/create_link_token",

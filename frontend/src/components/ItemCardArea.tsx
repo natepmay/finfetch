@@ -1,4 +1,8 @@
 import { ItemCard } from "./ItemCard";
+import { getItems } from "../data";
+
+const items = await getItems();
+console.log(items);
 
 export function ItemCardArea() {
   return (

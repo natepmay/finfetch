@@ -88,15 +88,16 @@ export function addAccount(
   );
 }
 
-export function queryDb(db: DB) {
+export function getItems(db: DB) {
   const results = [];
-  for (const [name, itemId, accessToken] of db.query(
-    "SELECT name, item_id as itemId, access_token as accessToken FROM items"
-  ) as Iterable<[string, string, string]>) {
+  for (const [name, itemId, accessToken, cursor] of db.query(
+    "SELECT name, item_id as itemId, access_token as accessToken, cursor FROM items"
+  ) as Iterable<[string, string, string, string]>) {
     results.push({
       name,
       itemId,
       accessToken,
+      cursor,
     });
   }
   return results;
