@@ -30,7 +30,10 @@ export function AddItemButtonArea() {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ publicToken: publicToken }),
+            body: JSON.stringify({
+              publicToken: publicToken,
+              metadata: metadata,
+            }),
           }
         );
         const data = (await response.json()) as { itemId: string };

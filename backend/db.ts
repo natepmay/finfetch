@@ -26,24 +26,27 @@ export function initDb(db: DB) {
       );
     `);
     console.log("success!");
-  } catch (err) {
-    console.log("error!", err);
+  } catch (_) {
+    console.log("Items is already created :-) or maybe there's an error :-(");
     itemsAlreadyCreated = true;
   }
 
   try {
     db.execute(`
       CREATE TABLE accounts (
-        account_id INTEGER PRIMARY KEY,
+        account_id TEXT PRIMARY KEY,
         item_id TEXT NOT NULL,
         name TEXT,
+        nickname TEXT,
         FOREIGN KEY (item_id)
           REFERENCES items (item_id)
       );
     `);
     console.log("success!");
-  } catch (err) {
-    console.log("error!", err);
+  } catch (_) {
+    console.log(
+      "Accounts is already created :-) or maybe there's an error :-("
+    );
   }
 
   if (itemsAlreadyCreated) return;
@@ -66,6 +69,23 @@ export function addItem(
     item.access_token,
     item.name ?? null,
   ]);
+}
+
+export function addAccount(
+  db: DB,
+  account: {
+    account_id: string;
+    item_id: string;
+    name?: string;
+    nickname?: string;
+  }
+) {
+  console.log("account:", account);
+  const { account_id, item_id, name, nickname } = account;
+  db.query(
+    "INSERT INTO accounts (account_id, item_id, name, nickname) VALUES(?, ?, ?, ?)",
+    [account_id, item_id, name ?? null, nickname ?? name ?? null]
+  );
 }
 
 export function queryDb(db: DB) {

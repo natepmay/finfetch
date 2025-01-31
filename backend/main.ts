@@ -13,7 +13,8 @@ import {
 import { SimpleTransaction } from "./simpleTransactionObject.ts";
 import { stringify } from "jsr:@std/csv";
 import { DB } from "https://deno.land/x/sqlite/mod.ts";
-import { initDb, queryDb, addItem } from "./db.ts";
+import { initDb, queryDb, addItem, addAccount } from "./db.ts";
+import { PlaidLinkOnSuccessMetadata } from "./types.ts";
 import "jsr:@std/dotenv/load";
 
 const app = express();
@@ -94,15 +95,25 @@ app.post(
     res: express.Response,
     next: express.NextFunction
   ) {
-    // lower snake case for request?
     console.log(req.body);
-    const publicToken = req.body.publicToken;
+    const { publicToken, metadata } = req.body as {
+      publicToken: string;
+      metadata: PlaidLinkOnSuccessMetadata;
+    };
     try {
       const tokenResponse = await client.itemPublicTokenExchange({
         public_token: publicToken,
       });
       const { access_token, item_id } = tokenResponse.data;
-      addItem(db, { access_token, item_id });
+      addItem(db, { access_token, item_id, name: metadata.institution?.name });
+      for (const account of metadata.accounts) {
+        addAccount(db, {
+          account_id: account.id,
+          item_id: item_id,
+          name: account.name + " " + account.mask,
+          nickname: account.name + " " + account.mask,
+        });
+      }
       // Don't return the access token to the client for security reasons
       res.json({
         itemId: item_id,
