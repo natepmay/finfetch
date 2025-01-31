@@ -5,9 +5,9 @@ import { ItemCardArea } from "./components/ItemCardArea";
 import { NoItemsMessage } from "./components/NoItemsMessage";
 
 function App() {
-  const haveData = false;
+  const haveData = true;
   return (
-    <div className="bg-gray-100 pb-5 h-screen">
+    <div className="bg-gray-100 pb-5 h-full">
       <Header></Header>
       <DownloadButtonArea disabled={!haveData}></DownloadButtonArea>
       {haveData ? (

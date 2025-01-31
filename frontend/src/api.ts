@@ -1,6 +1,6 @@
 const BASE_BACKEND_URL = "http://localhost:3002";
 
-interface Item {
+export interface Item {
   itemId: string;
   name: string;
 }
