@@ -1,4 +1,6 @@
 import express from "npm:express";
+import cors from "npm:cors";
+import bodyParser from "npm:body-parser";
 import {
   Configuration,
   PlaidApi,
@@ -17,6 +19,11 @@ import "jsr:@std/dotenv/load";
 const app = express();
 const port = 3002;
 
+app.use(bodyParser.json());
+// CORS is enabled when running locally
+// For security, turn off if ever deployed publicly
+app.use(cors());
+
 const db = new DB("db.db");
 initDb(db);
 // TODO don't forget to close the db later
@@ -28,6 +35,8 @@ const PLAID_COUNTRY_CODES = Deno.env
   .get("PLAID_COUNTRY_CODES")
   ?.split(",") as CountryCode[];
 const PLAID_PRODUCTS = Deno.env.get("PLAID_PRODUCTS")?.split(",") as Products[];
+
+console.log("PLAID_CLIENT_ID", PLAID_CLIENT_ID);
 
 const configuration = new Configuration({
   basePath: PlaidEnvironments[PLAID_ENV!],
@@ -68,6 +77,7 @@ app.post(
       country_codes: PLAID_COUNTRY_CODES,
       language: "en",
     };
+    console.log(configs);
     try {
       const createTokenResponse = await client.linkTokenCreate(configs);
       res.json(createTokenResponse.data);
@@ -85,6 +95,7 @@ app.post(
     next: express.NextFunction
   ) {
     // lower snake case for request?
+    console.log(req.body);
     const publicToken = req.body.publicToken;
     try {
       const tokenResponse = await client.itemPublicTokenExchange({
@@ -94,7 +105,7 @@ app.post(
       addItem(db, { access_token, item_id });
       // Don't return the access token to the client for security reasons
       res.json({
-        item_id,
+        itemId: item_id,
       });
     } catch (error) {
       next(error);

@@ -16,7 +16,7 @@ function App() {
         <NoItemsMessage></NoItemsMessage>
       )}
 
-      <AddItemButtonArea disabled={false}></AddItemButtonArea>
+      <AddItemButtonArea></AddItemButtonArea>
     </div>
   );
 }
