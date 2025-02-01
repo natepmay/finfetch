@@ -54,11 +54,8 @@ const client = new PlaidApi(configuration);
 
 app.post("/api/sync", async (_: express.Request, res: express.Response) => {
   const items = getItems(db);
-  const itemResults = [];
-  for (const item of items) {
-    itemResults.push(await syncTransactions(item));
-  }
-  res.json(itemResults);
+  const csvString = await syncTransactions(items);
+  console.log(csvString);
 });
 
 app.post(
@@ -200,36 +197,47 @@ async function fetchNewSyncData(
   }
 }
 
-async function syncTransactions(item: {
+// TODO consolidate with frontend version
+interface Item {
   name: string;
   itemId: string;
   accessToken: string;
-}) {
+}
+
+async function syncTransactions(items: Item[]) {
   const simplifyTransactions = (transactions: Transaction[]) => {
     return transactions.map((transaction: Transaction) => {
       return SimpleTransaction.fromPlaidTransaction(transaction);
     });
   };
 
-  const rawData = await fetchNewSyncData(item.accessToken, "");
+  // TODO get the cursor for each item and store it
+  // TODO currently we add the account id but we want the account name
 
-  const simpleData = {
-    added: simplifyTransactions(rawData.added),
-    removed: rawData.removed,
-    modified: simplifyTransactions(rawData.modified),
-    nextCursor: rawData.nextCursor,
-    itemName: item.name,
-  };
+  const eachItemData = await Promise.all(
+    items.map(async (item) => {
+      const rawData = await fetchNewSyncData(item.accessToken, "");
+      return {
+        added: simplifyTransactions(rawData.added),
+        removed: rawData.removed,
+        modified: simplifyTransactions(rawData.modified),
+      };
+    })
+  );
 
-  const csvString = stringify(simpleData.added, {
-    columns: Object.keys(simpleData.added[0]),
+  const combinedData = eachItemData.reduce((acc, data) => ({
+    added: [...acc.added, ...data.added],
+    removed: [...acc.removed, ...data.removed],
+    modified: [...acc.modified, ...data.modified],
+  }));
+
+  const csvString = stringify(combinedData.added, {
+    columns: Object.keys(combinedData.added[0]),
   });
 
-  console.log(csvString);
-
-  await Deno.writeTextFile("./out/added.csv", csvString);
+  // await Deno.writeTextFile("./out/added.csv", csvString);
   // TODO support removed (maybe just reverse the transaction?), modified
   // explore the import in hledger to see what would make sense as default
 
-  return simpleData;
+  return csvString;
 }
