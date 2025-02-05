@@ -1,3 +1,5 @@
+import downloadAndSaveFile from "./download";
+
 const BASE_BACKEND_URL = "http://localhost:3002";
 
 export interface Item {
@@ -29,4 +31,11 @@ export async function getAccounts(itemId: string): Promise<Account[]> {
   }
   const data: Account[] = await res.json();
   return data;
+}
+
+export async function downloadWrapper(): Promise<void> {
+  return await downloadAndSaveFile({
+    url: `${BASE_BACKEND_URL}/api/sync`,
+    defaultFileName: "default-download.csv",
+  });
 }

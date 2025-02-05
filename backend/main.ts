@@ -52,10 +52,11 @@ const configuration = new Configuration({
 
 const client = new PlaidApi(configuration);
 
-app.post("/api/sync", async (_: express.Request, res: express.Response) => {
+app.get("/api/sync", async (_: express.Request, res: express.Response) => {
   const items = getItems(db);
   const csvString = await syncTransactions(items);
   console.log(csvString);
+  res.attachment("combined.csv").send(csvString);
 });
 
 app.post(
