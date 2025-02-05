@@ -1,3 +1,6 @@
+import { Modal } from "./Modal";
+import { useState } from "react";
+
 interface Props {
   name: string;
   nickname: string;
@@ -5,6 +8,8 @@ interface Props {
 }
 
 export function ItemCardAccount({ name, nickname, lastDownloaded }: Props) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <article className="border-b-2 border-b-gray-200 pt-3">
       <header className="flex justify-between items-center">
@@ -16,7 +21,12 @@ export function ItemCardAccount({ name, nickname, lastDownloaded }: Props) {
           <div className="text-sm font-bold">Nickname</div>
           <div className="text-lg font-light text-center">
             {nickname}{" "}
-            <a className="text-blue-600 text-xs underline ml-1">Edit</a>
+            <a
+              className="text-blue-600 text-xs underline ml-1"
+              onClick={() => setIsModalOpen(true)}
+            >
+              Edit
+            </a>
           </div>
         </div>
         <div className="flex flex-col items-center">
@@ -24,6 +34,10 @@ export function ItemCardAccount({ name, nickname, lastDownloaded }: Props) {
           <div className="text-lg font-light">{lastDownloaded}</div>
         </div>
       </div>
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        {" "}
+        Here are the modal contents!{" "}
+      </Modal>
     </article>
   );
 }
