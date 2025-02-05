@@ -2,7 +2,13 @@ import { ItemCard } from "./ItemCard";
 import { getItems, Item } from "../api";
 import { useState, useEffect } from "react";
 
-export function ItemCardArea() {
+export function ItemCardArea({
+  hasNewData,
+  onUpdateData,
+}: {
+  hasNewData: boolean;
+  onUpdateData: () => void;
+}) {
   const [items, setItems] = useState<Item[]>([]);
 
   useEffect(() => {
@@ -11,15 +17,16 @@ export function ItemCardArea() {
       const result = await getItems();
       if (!ignore) {
         setItems(result);
+        onUpdateData();
       }
     }
 
     let ignore = false;
-    startFetching();
+    if (hasNewData) startFetching();
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [hasNewData, onUpdateData]);
 
   const itemCards = items.map((item) => (
     <ItemCard
