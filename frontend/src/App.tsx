@@ -4,6 +4,8 @@ import { Header } from "./components/Header";
 import { ItemCardArea } from "./components/ItemCardArea";
 import { NoItemsMessage } from "./components/NoItemsMessage";
 
+import { Button } from "./components/Button";
+
 import { useRef } from "react";
 
 function App() {
@@ -21,6 +23,9 @@ function App() {
       )}
 
       <AddItemButtonArea></AddItemButtonArea>
+      <Button onClick={async () => await itemCardAreRef.current?.refresh()}>
+        Refresh
+      </Button>
     </div>
   );
 }
