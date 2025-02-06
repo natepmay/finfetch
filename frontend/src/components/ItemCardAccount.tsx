@@ -1,5 +1,6 @@
 import { Modal } from "./Modal";
 import { useState } from "react";
+import { Button } from "./Button";
 
 interface Props {
   name: string;
@@ -35,8 +36,22 @@ export function ItemCardAccount({ name, nickname, lastDownloaded }: Props) {
         </div>
       </div>
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        {" "}
-        Here are the modal contents!{" "}
+        <form className="flex flex-col gap-5">
+          <h3>
+            <label htmlFor="nickname">New nickname for {name}:</label>
+          </h3>
+          <input
+            type="text"
+            id="nickname"
+            name="nickname"
+            value={nickname}
+            className="border-2 border-gray-300 p-2"
+          ></input>
+          <Button type="submit" onClick={() => {}}>
+            Submit
+          </Button>
+          <Button onClick={() => setIsModalOpen(false)}>Cancel</Button>
+        </form>
       </Modal>
     </article>
   );
