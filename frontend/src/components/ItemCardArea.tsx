@@ -12,6 +12,7 @@ export function ItemCardArea({ ref }: Ref) {
   const [items, setItems] = useState<Item[]>([]);
 
   async function startFetching() {
+    console.log("fetching");
     const result = await getItems();
     setItems(result);
   }

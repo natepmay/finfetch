@@ -10,20 +10,31 @@ import { useRef } from "react";
 
 function App() {
   const haveData = true;
-  const itemCardAreRef = useRef<{ refresh: () => Promise<void> } | null>(null);
+  const itemCardAreaRef = useRef<{ refresh: () => Promise<void> } | null>(null);
+
+  async function refreshItems() {
+    console.log("inside refreshItems", itemCardAreaRef.current);
+    await itemCardAreaRef.current?.refresh();
+  }
 
   return (
     <div className="bg-gray-100 pb-5 h-full">
       <Header></Header>
       <DownloadButtonArea disabled={!haveData}></DownloadButtonArea>
       {haveData ? (
-        <ItemCardArea ref={itemCardAreRef}></ItemCardArea>
+        <ItemCardArea ref={itemCardAreaRef}></ItemCardArea>
       ) : (
         <NoItemsMessage></NoItemsMessage>
       )}
 
-      <AddItemButtonArea></AddItemButtonArea>
-      <Button onClick={async () => await itemCardAreRef.current?.refresh()}>
+      <AddItemButtonArea refreshItems={refreshItems}></AddItemButtonArea>
+      <Button
+        onClick={async () => {
+          console.log("clicked");
+          console.log(itemCardAreaRef.current);
+          await refreshItems();
+        }}
+      >
         Refresh
       </Button>
     </div>
