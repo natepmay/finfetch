@@ -4,7 +4,7 @@ import { useCallback, useState, useEffect } from "react";
 
 const BASE_BACKEND_URL = "http://localhost:3002";
 
-export function AddItemButtonArea({ onAddData }: { onAddData: () => void }) {
+export function AddItemButtonArea() {
   const [token, setToken] = useState<string | null>(null);
   useEffect(() => {
     // TODO move this function to data.ts
@@ -40,12 +40,12 @@ export function AddItemButtonArea({ onAddData }: { onAddData: () => void }) {
         const data = (await response.json()) as { itemId: string };
         console.log(publicToken, metadata);
         console.log("itemId returned from API: ", data.itemId);
-        onAddData();
+        // TODO call the refresh function here
       } catch (error) {
         console.error(error);
       }
     },
-    [onAddData]
+    []
   );
 
   const { open, ready } = usePlaidLink({

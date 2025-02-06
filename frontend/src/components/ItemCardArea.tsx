@@ -2,30 +2,21 @@ import { ItemCard } from "./ItemCard";
 import { getItems, Item } from "../api";
 import { useState, useEffect } from "react";
 
-export function ItemCardArea({
-  hasNewData,
-  onUpdateData,
-}: {
-  hasNewData: boolean;
-  onUpdateData: () => void;
-}) {
+export function ItemCardArea() {
   const [items, setItems] = useState<Item[]>([]);
 
-  useEffect(() => {
-    async function startFetching() {
-      const result = await getItems();
-      if (!ignore) {
-        setItems(result);
-        onUpdateData();
-      }
-    }
+  async function startFetching() {
+    const result = await getItems();
+    setItems(result);
+  }
 
+  useEffect(() => {
     let ignore = false;
-    if (hasNewData) startFetching();
+    if (!ignore) startFetching();
     return () => {
       ignore = true;
     };
-  }, [hasNewData, onUpdateData]);
+  }, []);
 
   const itemCards = items.map((item) => (
     <ItemCard
