@@ -38,7 +38,7 @@ export function Modal({
           <X
             className="h-7 w-7 p-1 hover:bg-gray-200 rounded-full cursor-pointer"
             color="#888"
-            stroke-width="1.5"
+            strokeWidth="1.5"
           ></X>
           <span className="sr-only">Close</span>
         </button>

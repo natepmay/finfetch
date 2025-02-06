@@ -1,15 +1,28 @@
 import { Modal } from "./Modal";
 import { useState } from "react";
 import { Button } from "./Button";
+import { updateAccount, Account } from "../api";
 
-interface Props {
-  name: string;
-  nickname: string;
-  lastDownloaded: string;
-}
+const lastDownloaded = "Not sure";
 
-export function ItemCardAccount({ name, nickname, lastDownloaded }: Props) {
+export function ItemCardAccount({ account }: { account: Account }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  async function handleNicknameSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const nextNickname = formData.get("nickname") as string;
+    const nextAccount = {
+      ...account,
+      nickname: nextNickname,
+    };
+    await updateAccount(nextAccount);
+    setIsModalOpen(false);
+
+    // TODO refresh the card
+  }
+
+  const { name, nickname } = account;
 
   return (
     <article className="border-b-2 border-b-gray-200 pt-3">
@@ -36,7 +49,7 @@ export function ItemCardAccount({ name, nickname, lastDownloaded }: Props) {
         </div>
       </div>
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <form className="flex flex-col">
+        <form className="flex flex-col" onSubmit={handleNicknameSubmit}>
           <h2 className="font-bold text-lg mb-4">Account Nickname</h2>
           <h3 className="mb-2">
             <label htmlFor="nickname">New nickname for {name}:</label>
@@ -45,7 +58,7 @@ export function ItemCardAccount({ name, nickname, lastDownloaded }: Props) {
             type="text"
             id="nickname"
             name="nickname"
-            value={nickname}
+            defaultValue={nickname}
             className="border-2 border-gray-300 p-2 mb-4"
           ></input>
           <Button type="submit" onClick={() => {}}>

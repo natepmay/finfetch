@@ -39,3 +39,18 @@ export async function downloadWrapper(): Promise<void> {
     defaultFileName: "default-download.csv",
   });
 }
+
+export async function updateAccount(resource: Account) {
+  const res = await fetch(
+    `${BASE_BACKEND_URL}/api/accounts/${resource.accountId}`,
+    {
+      method: "PUT",
+      body: JSON.stringify(resource),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  const numRows: number = await res.json();
+  return numRows;
+}

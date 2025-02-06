@@ -31,9 +31,7 @@ export function ItemCard({
   const accountDisplays = accounts.map((account) => {
     return (
       <ItemCardAccount
-        name={account.name}
-        nickname={account.nickname}
-        lastDownloaded="Who knows"
+        account={account}
         key={account.accountId}
       ></ItemCardAccount>
     );

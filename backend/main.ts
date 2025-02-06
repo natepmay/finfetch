@@ -13,7 +13,14 @@ import {
 import { SimpleTransaction } from "./simpleTransactionObject.ts";
 import { stringify } from "jsr:@std/csv";
 import { DB } from "https://deno.land/x/sqlite/mod.ts";
-import { initDb, getItems, addItem, addAccount, getAccounts } from "./db.ts";
+import {
+  initDb,
+  getItems,
+  addItem,
+  addAccount,
+  getAccounts,
+  updateAccount,
+} from "./db.ts";
 import { PlaidLinkOnSuccessMetadata } from "./types.ts";
 import "jsr:@std/dotenv/load";
 
@@ -111,7 +118,6 @@ app.post(
     res: express.Response,
     next: express.NextFunction
   ) {
-    console.log(req.body);
     const { publicToken, metadata } = req.body as {
       publicToken: string;
       metadata: PlaidLinkOnSuccessMetadata;
@@ -133,6 +139,27 @@ app.post(
       // Don't return the access token to the client for security reasons
       res.json({
         itemId: item_id,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+app.put(
+  "/api/accounts/:accountId",
+  function (
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) {
+    try {
+      const resource = req.body;
+      console.log("resource in main.ts: ", resource);
+      const { accountId } = req.params;
+      const result = updateAccount(db, accountId, resource);
+      res.json({
+        rowsAffected: result,
       });
     } catch (error) {
       next(error);

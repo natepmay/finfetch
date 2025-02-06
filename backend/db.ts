@@ -120,3 +120,24 @@ export function getAccounts(db: DB, itemId: string) {
   }
   return results;
 }
+
+interface Resource {
+  [key: string]: string | undefined;
+}
+
+export function updateAccount(db: DB, accountId: string, resourceIn: Resource) {
+  if (accountId !== resourceIn.accountId)
+    throw new Error("Account ids don't match.");
+  const resource = { ...resourceIn };
+  delete resource.accountId;
+
+  const fields = Object.keys(resource);
+  const values = Object.values(resource);
+
+  const setClause = fields.map((field) => `${field} = ?`).join(", ");
+  const sql = `UPDATE accounts SET ${setClause} WHERE account_id = ?`;
+
+  db.query(sql, [...values, accountId]);
+
+  return 1;
+}
