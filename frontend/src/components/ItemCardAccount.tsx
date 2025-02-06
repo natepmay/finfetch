@@ -33,7 +33,6 @@ export function ItemCardAccount({
     <article className="border-b-2 border-b-gray-200 pt-3">
       <header className="flex justify-between items-center">
         <h3 className="text-xl font-bold">{name} </h3>
-        <a className="text-blue-600 text-xs underline">Remove</a>
       </header>
       <div className="grid grid-cols-2 my-3">
         <div className="flex flex-col items-center">
@@ -41,7 +40,7 @@ export function ItemCardAccount({
           <div className="text-lg font-light text-center">
             {nickname}{" "}
             <a
-              className="text-blue-600 text-xs underline ml-1"
+              className="text-blue-600 text-xs underline ml-1 cursor-pointer"
               onClick={() => setIsModalOpen(true)}
             >
               Edit
