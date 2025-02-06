@@ -5,7 +5,13 @@ import { updateAccount, Account } from "../api";
 
 const lastDownloaded = "Not sure";
 
-export function ItemCardAccount({ account }: { account: Account }) {
+export function ItemCardAccount({
+  account,
+  refreshAccounts,
+}: {
+  account: Account;
+  refreshAccounts: () => Promise<void>;
+}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   async function handleNicknameSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -18,8 +24,7 @@ export function ItemCardAccount({ account }: { account: Account }) {
     };
     await updateAccount(nextAccount);
     setIsModalOpen(false);
-
-    // TODO refresh the card
+    await refreshAccounts();
   }
 
   const { name, nickname } = account;

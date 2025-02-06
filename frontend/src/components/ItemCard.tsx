@@ -12,27 +12,25 @@ export function ItemCard({
 }) {
   const [accounts, setAccounts] = useState<Account[]>([]);
 
-  useEffect(() => {
-    async function startFetching() {
-      setAccounts([]);
-      const result = await getAccounts(itemId);
-      if (!ignore) {
-        setAccounts(result);
-      }
-    }
+  async function startFetching() {
+    const result = await getAccounts(itemId);
+    setAccounts(result);
+  }
 
+  useEffect(() => {
     let ignore = false;
-    startFetching();
+    if (!ignore) startFetching();
     return () => {
       ignore = true;
     };
-  }, [itemId]);
+  }, []);
 
   const accountDisplays = accounts.map((account) => {
     return (
       <ItemCardAccount
         account={account}
         key={account.accountId}
+        refreshAccounts={startFetching}
       ></ItemCardAccount>
     );
   });
