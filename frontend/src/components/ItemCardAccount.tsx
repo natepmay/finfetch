@@ -36,8 +36,9 @@ export function ItemCardAccount({ name, nickname, lastDownloaded }: Props) {
         </div>
       </div>
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <form className="flex flex-col gap-5">
-          <h3>
+        <form className="flex flex-col">
+          <h2 className="font-bold text-lg mb-4">Account Nickname</h2>
+          <h3 className="mb-2">
             <label htmlFor="nickname">New nickname for {name}:</label>
           </h3>
           <input
@@ -45,12 +46,11 @@ export function ItemCardAccount({ name, nickname, lastDownloaded }: Props) {
             id="nickname"
             name="nickname"
             value={nickname}
-            className="border-2 border-gray-300 p-2"
+            className="border-2 border-gray-300 p-2 mb-4"
           ></input>
           <Button type="submit" onClick={() => {}}>
             Submit
           </Button>
-          <Button onClick={() => setIsModalOpen(false)}>Cancel</Button>
         </form>
       </Modal>
     </article>
