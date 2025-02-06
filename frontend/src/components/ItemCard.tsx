@@ -1,7 +1,7 @@
 import { ItemCardAccount } from "./ItemCardAccount";
 import { ItemHeader } from "./ItemHeader";
 import { getAccounts, Account } from "../api";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 export function ItemCard({
   itemName,
@@ -12,10 +12,10 @@ export function ItemCard({
 }) {
   const [accounts, setAccounts] = useState<Account[]>([]);
 
-  async function startFetching() {
+  const startFetching = useCallback(async () => {
     const result = await getAccounts(itemId);
     setAccounts(result);
-  }
+  }, [itemId]);
 
   useEffect(() => {
     let ignore = false;
@@ -23,7 +23,7 @@ export function ItemCard({
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [startFetching]);
 
   const accountDisplays = accounts.map((account) => {
     return (
