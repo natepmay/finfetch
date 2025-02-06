@@ -1,8 +1,14 @@
 import { ItemCard } from "./ItemCard";
 import { getItems, Item } from "../api";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useImperativeHandle } from "react";
 
-export function ItemCardArea() {
+type Ref = {
+  ref: React.Ref<{
+    refresh: () => Promise<void>;
+  }>;
+};
+
+export function ItemCardArea({ ref }: Ref) {
   const [items, setItems] = useState<Item[]>([]);
 
   async function startFetching() {
@@ -17,6 +23,12 @@ export function ItemCardArea() {
       ignore = true;
     };
   }, []);
+
+  useImperativeHandle(ref, () => {
+    return {
+      refresh: startFetching,
+    };
+  });
 
   const itemCards = items.map((item) => (
     <ItemCard

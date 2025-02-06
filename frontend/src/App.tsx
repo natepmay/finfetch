@@ -4,14 +4,18 @@ import { Header } from "./components/Header";
 import { ItemCardArea } from "./components/ItemCardArea";
 import { NoItemsMessage } from "./components/NoItemsMessage";
 
+import { useRef } from "react";
+
 function App() {
   const haveData = true;
+  const itemCardAreRef = useRef<{ refresh: () => Promise<void> } | null>(null);
+
   return (
     <div className="bg-gray-100 pb-5 h-full">
       <Header></Header>
       <DownloadButtonArea disabled={!haveData}></DownloadButtonArea>
       {haveData ? (
-        <ItemCardArea></ItemCardArea>
+        <ItemCardArea ref={itemCardAreRef}></ItemCardArea>
       ) : (
         <NoItemsMessage></NoItemsMessage>
       )}
