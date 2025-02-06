@@ -13,7 +13,6 @@ export function ItemCardArea({
 
   useEffect(() => {
     async function startFetching() {
-      setItems([]);
       const result = await getItems();
       if (!ignore) {
         setItems(result);
