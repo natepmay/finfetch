@@ -141,3 +141,20 @@ export function updateAccount(db: DB, accountId: string, resourceIn: Resource) {
 
   return 1;
 }
+
+export function deleteItem(db: DB, itemId: string) {
+  const deletedRows = db.query(
+    `
+      DELETE from accounts WHERE item_id = ?
+      `,
+    [itemId]
+  );
+  db.query(
+    `
+    DELETE from items WHERE item_id = ?
+    `,
+    [itemId]
+  );
+
+  return deletedRows.length;
+}

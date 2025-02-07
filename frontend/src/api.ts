@@ -54,3 +54,13 @@ export async function updateAccount(resource: Account) {
   const numRows: number = await res.json();
   return numRows;
 }
+
+export async function deleteItem(itemId: string) {
+  try {
+    await fetch(`${BASE_BACKEND_URL}/api/items/${itemId}`, {
+      method: "DELETE",
+    });
+  } catch (error) {
+    throw new Error(String(error));
+  }
+}

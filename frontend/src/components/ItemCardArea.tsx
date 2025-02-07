@@ -32,11 +32,7 @@ export function ItemCardArea({ ref }: Ref) {
   });
 
   const itemCards = items.map((item) => (
-    <ItemCard
-      itemName={item.name}
-      key={item.itemId}
-      itemId={item.itemId}
-    ></ItemCard>
+    <ItemCard item={item} key={item.itemId}></ItemCard>
   ));
 
   return (

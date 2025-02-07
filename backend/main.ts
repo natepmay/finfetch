@@ -19,6 +19,7 @@ import {
   addItem,
   addAccount,
   getAccounts,
+  deleteItem,
   updateAccount,
 } from "./db.ts";
 import { PlaidLinkOnSuccessMetadata } from "./types.ts";
@@ -161,6 +162,28 @@ app.put(
       res.json({
         rowsAffected: result,
       });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+app.delete(
+  "/api/items/:itemId",
+  async function (
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) {
+    try {
+      const { itemId } = req.params;
+      const item = getItems(db).find((item) => item.itemId === itemId);
+      if (!item) throw new Error("Requested item does not exist");
+      await client.itemRemove({
+        access_token: item.accessToken,
+      });
+      deleteItem(db, itemId);
+      res.status(204).send("Deleted");
     } catch (error) {
       next(error);
     }
