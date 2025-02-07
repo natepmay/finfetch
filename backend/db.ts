@@ -1,18 +1,5 @@
 import { DB } from "https://deno.land/x/sqlite/mod.ts";
 
-const sandboxItems = [
-  {
-    name: "Huntington",
-    itemId: "NopMQyoGNNFxxBNnnVnesZ31orAEg9CWWrQqw",
-    accessToken: "access-sandbox-7b96f67b-95b2-4f9c-85d0-a50ccd189840",
-  },
-  {
-    name: "Capitalone",
-    itemId: "x7GNPNoLnafDnRvXRAKoC3mwZaBGkXhnNkAL7",
-    accessToken: "access-sandbox-0c3de7f9-3abd-4f95-86c6-d8e249b84b49",
-  },
-];
-
 export function initDb(db: DB) {
   let itemsAlreadyCreated = false;
 
@@ -50,14 +37,6 @@ export function initDb(db: DB) {
   }
 
   if (itemsAlreadyCreated) return;
-
-  // Add Sandbox values
-  for (const item of sandboxItems) {
-    db.query(
-      "INSERT INTO items (name, item_id, access_token) VALUES(?, ?, ?)",
-      [item.name, item.itemId, item.accessToken]
-    );
-  }
 }
 
 export function addItem(

@@ -1,16 +1,19 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Modal } from "./Modal";
 import { Button } from "./Button";
 import { deleteItem, Item } from "../api";
+import { RefreshContext } from "../context/RefreshContext";
 
 export function ItemHeader({ item }: { item: Item }) {
   type ModalState = "closed" | "removeConfirm";
+
   const [modalState, setModalState] = useState("closed" as ModalState);
+  const refreshItems = useContext(RefreshContext);
 
   async function handleConfirm() {
     await deleteItem(item.itemId);
+    await refreshItems();
     setModalState("closed");
-    // TODO refresh items
   }
 
   return (
