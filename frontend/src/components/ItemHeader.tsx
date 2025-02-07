@@ -10,6 +10,7 @@ export function ItemHeader({ item }: { item: Item }) {
   async function handleConfirm() {
     await deleteItem(item.itemId);
     setModalState("closed");
+    // TODO refresh items
   }
 
   return (

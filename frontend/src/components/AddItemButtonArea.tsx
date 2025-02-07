@@ -1,15 +1,14 @@
 import { Button } from "./Button";
 import { usePlaidLink, PlaidLinkOnSuccess } from "react-plaid-link";
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, useContext } from "react";
+import { RefreshContext } from "../context/RefreshContext";
 
 const BASE_BACKEND_URL = "http://localhost:3002";
 
-export function AddItemButtonArea({
-  refreshItems,
-}: {
-  refreshItems: () => Promise<void>;
-}) {
+export function AddItemButtonArea() {
   const [token, setToken] = useState<string | null>(null);
+  const refreshItems = useContext(RefreshContext);
+
   useEffect(() => {
     // TODO move this function to data.ts
     const createLinkToken = async () => {
