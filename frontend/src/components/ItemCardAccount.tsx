@@ -50,7 +50,7 @@ export function ItemCardAccount({
         <div className="flex flex-col items-center">
           <div className="text-sm font-bold">Last Downloaded</div>
           <div className="text-lg font-light">
-            <DistanceSinceDownloaded lastDownloaded={1739003758625} />
+            <DistanceSinceDownloaded lastDownloaded={lastDownloaded} />
           </div>
         </div>
       </div>

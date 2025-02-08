@@ -12,5 +12,5 @@ export interface Account {
   itemId: string;
   name: string;
   nickname: string;
-  lastDownloaded: string;
+  lastDownloaded: number | null;
 }

@@ -20,9 +20,8 @@ export function DistanceSinceDownloaded({
     updateText();
 
     const interval = setInterval(() => updateText(), 60000);
-
     return () => clearInterval(interval);
   }, [lastDownloaded]);
 
-  return <>{lastDownloaded ? text : "Never"} ago</>;
+  return <>{lastDownloaded ? text + " ago" : "Never"}</>;
 }

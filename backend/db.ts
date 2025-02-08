@@ -27,7 +27,7 @@ export function initDb(db: DB) {
         item_id TEXT NOT NULL,
         name TEXT,
         nickname TEXT,
-        last_downloaded TEXT,
+        last_downloaded INTEGER,
         FOREIGN KEY (item_id)
           REFERENCES items (item_id)
       );
@@ -91,7 +91,7 @@ export function getAccounts(db: DB, requestedItemId: string): Account[] {
     WHERE item_id = ?
     `,
     [requestedItemId]
-  ) as Iterable<[string, string, string, string, string]>) {
+  ) as Iterable<[string, string, string, string, number | null]>) {
     results.push({ name, nickname, accountId, itemId, lastDownloaded });
   }
 
