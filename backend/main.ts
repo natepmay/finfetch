@@ -59,7 +59,7 @@ const configuration = new Configuration({
 
 const client = new PlaidApi(configuration);
 
-app.get("/api/sync", async (res: Response) => {
+app.get("/api/sync", async (_: Request, res: Response) => {
   const items = getItems(db);
   const csvString = await syncTransactions(client, items);
   res.attachment("combined.csv").send(csvString);
@@ -67,7 +67,7 @@ app.get("/api/sync", async (res: Response) => {
 
 app.post(
   "/api/create_link_token",
-  async function (res: Response, next: NextFunction) {
+  async function (_: Request, res: Response, next: NextFunction) {
     const configs = {
       user: {
         // currently hardcoded as "1" with the assumption of only one user
@@ -88,7 +88,7 @@ app.post(
 );
 
 // probably should just be "/api/items"
-app.get("/api/getItems", function (res: Response) {
+app.get("/api/getItems", function (_: Request, res: Response) {
   const items = getItems(db);
   const itemsFrontend = items.map((item) => ({
     itemId: item.itemId,
@@ -173,7 +173,7 @@ app.delete(
 );
 
 // for testing: get a user token so you can call client.userItemsGet
-app.post("/api/user/1/create", async function (res: Response) {
+app.post("/api/user/1/create", async function (_: Request, res: Response) {
   try {
     const resp = await client.userCreate({ client_user_id: "1" });
     console.log(resp);
@@ -186,7 +186,7 @@ app.post("/api/user/1/create", async function (res: Response) {
 
 // for testing: add your user token here when it's returned from client.userCreate
 const USER_TOKEN = "";
-app.get("/api/user/1/items", async function (res: Response) {
+app.get("/api/user/1/items", async function (_: Request, res: Response) {
   const { data } = await client.userItemsGet({
     user_token: USER_TOKEN,
   });

@@ -9,6 +9,8 @@ export interface ServerItem extends Item {
 
 export interface Account {
   accountId: string;
+  itemId: string;
   name: string;
   nickname: string;
+  lastDownloaded: string;
 }
