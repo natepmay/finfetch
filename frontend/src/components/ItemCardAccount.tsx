@@ -4,8 +4,6 @@ import { Button } from "./Button";
 import { updateAccount } from "../api";
 import { Account } from "../../../sharedTypes";
 
-const lastDownloaded = "Not sure";
-
 export function ItemCardAccount({
   account,
   refreshAccounts,
@@ -28,7 +26,7 @@ export function ItemCardAccount({
     await refreshAccounts();
   }
 
-  const { name, nickname } = account;
+  const { name, nickname, lastDownloaded } = account;
 
   return (
     <article className="border-b-2 border-b-gray-200 pt-3">
@@ -50,7 +48,7 @@ export function ItemCardAccount({
         </div>
         <div className="flex flex-col items-center">
           <div className="text-sm font-bold">Last Downloaded</div>
-          <div className="text-lg font-light">{lastDownloaded}</div>
+          <div className="text-lg font-light">{lastDownloaded || "Never"}</div>
         </div>
       </div>
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>

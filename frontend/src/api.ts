@@ -24,10 +24,25 @@ export async function getAccounts(itemId: string): Promise<Account[]> {
 }
 
 export async function downloadWrapper(): Promise<void> {
-  return await downloadAndSaveFile({
+  await downloadAndSaveFile({
     url: `${BASE_BACKEND_URL}/api/sync`,
     defaultFileName: "default-download.csv",
   });
+
+  /*
+  Move all this to the server:
+  
+  const items = await getItems();
+
+  const allAccounts = await Promise.all(
+    items.map((item) => getAccounts(item.itemId))
+  );
+  const accounts = allAccounts.reduce((a, b) => a.concat(b), [])
+  
+  await Promise.all(accounts.map(account => {
+    updateAccount({...account, lastDownloaded: "This should happen on the server oops"})
+  }))
+  */
 }
 
 export async function updateAccount(resource: Account) {
