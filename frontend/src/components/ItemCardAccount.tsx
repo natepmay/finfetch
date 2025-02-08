@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button } from "./Button";
 import { updateAccount } from "../api";
 import { Account } from "../../../sharedTypes";
+import { DistanceSinceDownloaded } from "./DistanceSinceDownloaded";
 
 export function ItemCardAccount({
   account,
@@ -48,7 +49,9 @@ export function ItemCardAccount({
         </div>
         <div className="flex flex-col items-center">
           <div className="text-sm font-bold">Last Downloaded</div>
-          <div className="text-lg font-light">{lastDownloaded || "Never"}</div>
+          <div className="text-lg font-light">
+            <DistanceSinceDownloaded lastDownloaded={1739003758625} />
+          </div>
         </div>
       </div>
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
