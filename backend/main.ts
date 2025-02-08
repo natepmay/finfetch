@@ -1,4 +1,5 @@
 import express from "npm:express";
+import { Request, Response, NextFunction } from "npm:@types/express";
 import cors from "npm:cors";
 import bodyParser from "npm:body-parser";
 import {
@@ -27,8 +28,8 @@ const app = express();
 const port = 3002;
 
 app.use(bodyParser.json());
-// CORS is enabled when running locally
-// For security, turn off if ever deployed publicly
+// CORS is needed to talk to the frontend. Access is restricted to requests
+// from the same machine by explicitly setting the localhost IP in app.listen() below.
 app.use(cors());
 
 const db = new DB("db.db");
@@ -58,7 +59,7 @@ const configuration = new Configuration({
 
 const client = new PlaidApi(configuration);
 
-app.get("/api/sync", async (_: express.Request, res: express.Response) => {
+app.get("/api/sync", async (res: Response) => {
   const items = getItems(db);
   const csvString = await syncTransactions(client, items);
   res.attachment("combined.csv").send(csvString);
@@ -66,11 +67,7 @@ app.get("/api/sync", async (_: express.Request, res: express.Response) => {
 
 app.post(
   "/api/create_link_token",
-  async function (
-    _: express.Request,
-    res: express.Response,
-    next: express.NextFunction
-  ) {
+  async function (res: Response, next: NextFunction) {
     const configs = {
       user: {
         // currently hardcoded as "1" with the assumption of only one user
@@ -91,7 +88,7 @@ app.post(
 );
 
 // probably should just be "/api/items"
-app.get("/api/getItems", function (_: express.Request, res: express.Response) {
+app.get("/api/getItems", function (res: Response) {
   const items = getItems(db);
   const itemsFrontend = items.map((item) => ({
     itemId: item.itemId,
@@ -103,8 +100,8 @@ app.get("/api/getItems", function (_: express.Request, res: express.Response) {
 app.get(
   // maybe this should be "/api/items/:itemId/accounts"
   "/api/getAccounts",
-  function (req: express.Request, res: express.Response) {
-    const itemId: string = req.query.itemId;
+  function (req: Request, res: Response) {
+    const itemId = req.query.itemId as string;
     const accounts = getAccounts(db, itemId);
     res.json(accounts);
   }
@@ -112,11 +109,7 @@ app.get(
 
 app.post(
   "/api/create_access_token",
-  async function (
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction
-  ) {
+  async function (req: Request, res: Response, next: NextFunction) {
     const { publicToken, metadata } = req.body as {
       publicToken: string;
       metadata: PlaidLinkOnSuccessMetadata;
@@ -147,11 +140,7 @@ app.post(
 
 app.put(
   "/api/accounts/:accountId",
-  function (
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction
-  ) {
+  function (req: Request, res: Response, next: NextFunction) {
     try {
       const resource = req.body;
       const { accountId } = req.params;
@@ -167,11 +156,7 @@ app.put(
 
 app.delete(
   "/api/items/:itemId",
-  async function (
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction
-  ) {
+  async function (req: Request, res: Response, next: NextFunction) {
     try {
       const { itemId } = req.params;
       const item = getItems(db).find((item) => item.itemId === itemId);
@@ -187,6 +172,29 @@ app.delete(
   }
 );
 
-app.listen(port, () => {
+// for testing: get a user token so you can call client.userItemsGet
+app.post("/api/user/1/create", async function (res: Response) {
+  try {
+    const resp = await client.userCreate({ client_user_id: "1" });
+    console.log(resp);
+    res.json(resp.data);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send("error");
+  }
+});
+
+// for testing: add your user token here when it's returned from client.userCreate
+const USER_TOKEN = "";
+app.get("/api/user/1/items", async function (res: Response) {
+  const { data } = await client.userItemsGet({
+    user_token: USER_TOKEN,
+  });
+  console.log(data);
+  res.json(data);
+});
+
+// localhost IP set explicitly to prevent access from other devices on the network
+app.listen(port, "127.0.0.1", () => {
   console.log(`Finfetch listening on port ${port}`);
 });
