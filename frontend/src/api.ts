@@ -1,17 +1,7 @@
 import downloadAndSaveFile from "./download";
+import { Item, Account } from "../../sharedTypes.ts";
 
 const BASE_BACKEND_URL = "http://localhost:3002";
-
-export interface Item {
-  itemId: string;
-  name: string;
-}
-
-export interface Account {
-  accountId: string;
-  name: string;
-  nickname: string;
-}
 
 export async function getItems(): Promise<Item[]> {
   const res = await fetch(BASE_BACKEND_URL + "/api/getItems");

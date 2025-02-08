@@ -1,5 +1,6 @@
 import { ItemCard } from "./ItemCard";
-import { getItems, Item } from "../api";
+import { getItems } from "../api";
+import { Item } from "../../../sharedTypes";
 import { useState, useEffect, useImperativeHandle } from "react";
 
 type Ref = {

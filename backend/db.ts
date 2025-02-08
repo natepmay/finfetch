@@ -1,5 +1,7 @@
 import { DB } from "https://deno.land/x/sqlite/mod.ts";
 
+import { Account, ServerItem } from "../sharedTypes.ts";
+
 export function initDb(db: DB) {
   let itemsAlreadyCreated = false;
 
@@ -67,7 +69,7 @@ export function addAccount(
   );
 }
 
-export function getItems(db: DB) {
+export function getItems(db: DB): ServerItem[] {
   const results = [];
   for (const [name, itemId, accessToken, cursor] of db.query(
     "SELECT name, item_id as itemId, access_token as accessToken, cursor FROM items"
@@ -82,7 +84,7 @@ export function getItems(db: DB) {
   return results;
 }
 
-export function getAccounts(db: DB, itemId: string) {
+export function getAccounts(db: DB, itemId: string): Account[] {
   const results = [];
   for (const [name, nickname, accountId] of db.query(
     `
@@ -100,14 +102,10 @@ export function getAccounts(db: DB, itemId: string) {
   return results;
 }
 
-interface Resource {
-  [key: string]: string | undefined;
-}
-
-export function updateAccount(db: DB, accountId: string, resourceIn: Resource) {
+export function updateAccount(db: DB, accountId: string, resourceIn: Account) {
   if (accountId !== resourceIn.accountId)
     throw new Error("Account ids don't match.");
-  const resource = { ...resourceIn };
+  const resource: Partial<Account> = { ...resourceIn };
   delete resource.accountId;
 
   const fields = Object.keys(resource);
@@ -118,6 +116,7 @@ export function updateAccount(db: DB, accountId: string, resourceIn: Resource) {
 
   db.query(sql, [...values, accountId]);
 
+  // TODO return something that's not this
   return 1;
 }
 

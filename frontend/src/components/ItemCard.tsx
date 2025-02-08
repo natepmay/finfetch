@@ -1,6 +1,7 @@
 import { ItemCardAccount } from "./ItemCardAccount";
 import { ItemHeader } from "./ItemHeader";
-import { getAccounts, Account, Item } from "../api";
+import { getAccounts } from "../api";
+import { Item, Account } from "../../../sharedTypes";
 import { useState, useEffect, useCallback } from "react";
 
 export function ItemCard({ item }: { item: Item }) {

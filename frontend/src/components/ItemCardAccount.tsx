@@ -1,7 +1,8 @@
 import { Modal } from "./Modal";
 import { useState } from "react";
 import { Button } from "./Button";
-import { updateAccount, Account } from "../api";
+import { updateAccount } from "../api";
+import { Account } from "../../../sharedTypes";
 
 const lastDownloaded = "Not sure";
 

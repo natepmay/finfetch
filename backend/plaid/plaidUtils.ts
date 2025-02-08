@@ -1,6 +1,7 @@
 import { RemovedTransaction, Transaction, PlaidApi } from "npm:plaid";
 import { SimpleTransaction } from "./simpleTransactionObject.ts";
 import { stringify } from "jsr:@std/csv";
+import { ServerItem } from "../../sharedTypes.ts";
 
 async function fetchNewSyncData(
   client: PlaidApi,
@@ -62,14 +63,7 @@ async function fetchNewSyncData(
   }
 }
 
-// TODO consolidate with frontend version
-interface Item {
-  name: string;
-  itemId: string;
-  accessToken: string;
-}
-
-export async function syncTransactions(client: PlaidApi, items: Item[]) {
+export async function syncTransactions(client: PlaidApi, items: ServerItem[]) {
   const simplifyTransactions = (transactions: Transaction[]) => {
     return transactions.map((transaction: Transaction) => {
       return SimpleTransaction.fromPlaidTransaction(transaction);

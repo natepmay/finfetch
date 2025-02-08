@@ -1,7 +1,8 @@
 import { useState, useContext } from "react";
 import { Modal } from "./Modal";
 import { Button } from "./Button";
-import { deleteItem, Item } from "../api";
+import { deleteItem } from "../api";
+import { Item } from "../../../sharedTypes";
 import { RefreshContext } from "../context/RefreshContext";
 
 export function ItemHeader({ item }: { item: Item }) {
