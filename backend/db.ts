@@ -2,6 +2,11 @@ import { DB } from "https://deno.land/x/sqlite/mod.ts";
 
 import { Account, ServerItem } from "../sharedTypes.ts";
 
+/**
+ * Create the SQLite tables.
+ * @param db SQLite database instance.
+ * @returns Nothing.
+ */
 export function initDb(db: DB) {
   let itemsAlreadyCreated = false;
 
@@ -42,6 +47,11 @@ export function initDb(db: DB) {
   if (itemsAlreadyCreated) return;
 }
 
+/**
+ * Add an item to the database.
+ * @param db databse instance.
+ * @param item
+ */
 export function addItem(
   db: DB,
   item: { item_id: string; access_token: string; name?: string }
@@ -52,7 +62,11 @@ export function addItem(
     item.name ?? null,
   ]);
 }
-
+/**
+ * Add an account to the database.
+ * @param db database instance.
+ * @param account
+ */
 export function addAccount(
   db: DB,
   account: {
@@ -70,6 +84,11 @@ export function addAccount(
   );
 }
 
+/**
+ * Get all items from database.
+ * @param db database instance
+ * @returns array of items. Remove access token before sending to client.
+ */
 export function getItems(db: DB): ServerItem[] {
   const results = [];
 
@@ -82,15 +101,27 @@ export function getItems(db: DB): ServerItem[] {
   return results;
 }
 
-export function getAccounts(db: DB, requestedItemId: string): Account[] {
+/**
+ * Get accounts from the database.
+ * @param db database instance.
+ * @param requestedItemId If blank, get all accounts.
+ * @returns List of accounts.
+ */
+export function getAccounts(db: DB, requestedItemId?: string): Account[] {
   const results = [];
 
-  for (const [name, nickname, accountId, itemId, lastDownloaded] of db.query(
-    `
+  let query = `
     SELECT name, nickname, account_id as accountId, item_id as itemId, last_downloaded as lastDownloaded FROM accounts
-    WHERE item_id = ?
-    `,
-    [requestedItemId]
+    `;
+  const queryParams = [];
+  if (requestedItemId) {
+    query += ` WHERE item_id = ?`;
+    queryParams.push(requestedItemId);
+  }
+
+  for (const [name, nickname, accountId, itemId, lastDownloaded] of db.query(
+    query,
+    queryParams
   ) as Iterable<[string, string, string, string, number | null]>) {
     results.push({ name, nickname, accountId, itemId, lastDownloaded });
   }
@@ -98,6 +129,13 @@ export function getAccounts(db: DB, requestedItemId: string): Account[] {
   return results;
 }
 
+/**
+ * Update an account.
+ * @param db database instance
+ * @param accountId
+ * @param resourceIn updated account object. accountId property is used to locate.
+ * @returns
+ */
 export function updateAccount(db: DB, accountId: string, resourceIn: Account) {
   if (accountId !== resourceIn.accountId)
     throw new Error("Account ids don't match.");
@@ -116,6 +154,12 @@ export function updateAccount(db: DB, accountId: string, resourceIn: Account) {
   return 1;
 }
 
+/**
+ * Remove an item from the database.
+ * @param db database instance.
+ * @param itemId itemId of item to delete.
+ * @returns
+ */
 export function deleteItem(db: DB, itemId: string) {
   const deletedRows = db.query(`DELETE from accounts WHERE item_id = ?`, [
     itemId,

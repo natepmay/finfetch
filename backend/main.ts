@@ -62,6 +62,14 @@ const client = new PlaidApi(configuration);
 app.get("/api/sync", async (_: Request, res: Response) => {
   const items = getItems(db);
   const csvString = await syncTransactions(client, items);
+
+  // TODO handle error so we don't set a new lastDownloaded if it errored
+  const accounts = getAccounts(db);
+  const now = Date.now();
+  accounts.forEach((account) =>
+    updateAccount(db, account.accountId, { ...account, lastDownloaded: now })
+  );
+
   res.attachment("combined.csv").send(csvString);
 });
 
