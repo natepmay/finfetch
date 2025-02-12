@@ -2,9 +2,11 @@
   "version": "4",
   "specifiers": {
     "jsr:@std/assert@1": "1.0.8",
+    "jsr:@std/assert@^1.0.11": "1.0.11",
     "jsr:@std/bytes@^1.0.3": "1.0.4",
     "jsr:@std/csv@*": "1.0.3",
     "jsr:@std/dotenv@*": "0.225.2",
+    "jsr:@std/expect@*": "1.0.13",
     "jsr:@std/internal@^1.0.5": "1.0.5",
     "jsr:@std/streams@^1.0.4": "1.0.8",
     "npm:@types/express@*": "5.0.0",
@@ -20,6 +22,12 @@
         "jsr:@std/internal"
       ]
     },
+    "@std/assert@1.0.11": {
+      "integrity": "2461ef3c368fe88bc60e186e7744a93112f16fd110022e113a0849e94d1c83c1",
+      "dependencies": [
+        "jsr:@std/internal"
+      ]
+    },
     "@std/bytes@1.0.4": {
       "integrity": "11a0debe522707c95c7b7ef89b478c13fb1583a7cfb9a85674cd2cc2e3a28abc"
     },
@@ -31,6 +39,13 @@
     },
     "@std/dotenv@0.225.2": {
       "integrity": "e2025dce4de6c7bca21dece8baddd4262b09d5187217e231b033e088e0c4dd23"
+    },
+    "@std/expect@1.0.13": {
+      "integrity": "d8e236c7089cd9fcf5e6032f27dadc3db6349d0aee48c15bc71d717bca5baa42",
+      "dependencies": [
+        "jsr:@std/assert@^1.0.11",
+        "jsr:@std/internal"
+      ]
     },
     "@std/internal@1.0.5": {
       "integrity": "54a546004f769c1ac9e025abd15a76b6671ddc9687e2313b67376125650dc7ba"
