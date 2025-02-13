@@ -7,7 +7,7 @@ const BASE_BACKEND_URL = "http://localhost:3002";
 
 export function AddItemButtonArea() {
   const [token, setToken] = useState<string | null>(null);
-  const refreshItems = useContext(RefreshContext);
+  const refreshData = useContext(RefreshContext);
 
   useEffect(() => {
     // TODO move this function to data.ts
@@ -43,12 +43,12 @@ export function AddItemButtonArea() {
         const data = (await response.json()) as { itemId: string };
         console.log(publicToken, metadata);
         console.log("itemId returned from API: ", data.itemId);
-        await refreshItems();
+        refreshData();
       } catch (error) {
         console.error(error);
       }
     },
-    [refreshItems]
+    [refreshData]
   );
 
   const { open, ready } = usePlaidLink({

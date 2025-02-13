@@ -1,9 +1,15 @@
+import { useContext } from "react";
+
 import { Button } from "./Button";
 import { downloadWrapper } from "../api";
+import { RefreshContext } from "../context/RefreshContext";
 
 export function DownloadButtonArea({ disabled }: { disabled: boolean }) {
+  const refreshData = useContext(RefreshContext);
+
   async function handleOnClick() {
     await downloadWrapper();
+    refreshData();
   }
 
   return (

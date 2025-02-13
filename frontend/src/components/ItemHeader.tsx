@@ -9,11 +9,11 @@ export function ItemHeader({ item }: { item: Item }) {
   type ModalState = "closed" | "removeConfirm";
 
   const [modalState, setModalState] = useState("closed" as ModalState);
-  const refreshItems = useContext(RefreshContext);
+  const refreshData = useContext(RefreshContext);
 
   async function handleConfirm() {
     await deleteItem(item.itemId);
-    await refreshItems();
+    refreshData();
     setModalState("closed");
   }
 

@@ -10,7 +10,7 @@ export function ItemCardAccount({
   refreshAccounts,
 }: {
   account: Account;
-  refreshAccounts: () => Promise<void>;
+  refreshAccounts: () => void;
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -24,7 +24,7 @@ export function ItemCardAccount({
     };
     await updateAccount(nextAccount);
     setIsModalOpen(false);
-    await refreshAccounts();
+    refreshAccounts();
   }
 
   const { name, nickname, lastDownloaded } = account;

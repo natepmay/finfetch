@@ -5,7 +5,7 @@ import { ItemCardArea } from "./components/ItemCardArea";
 import { NoItemsMessage } from "./components/NoItemsMessage";
 import { getAccounts, getItems } from "./api";
 
-import { useRef, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { RefreshContext } from "./context/RefreshContext";
 import { DataContext, ItemWithAccounts } from "./context/DataContext";
 
@@ -25,29 +25,27 @@ function App() {
       );
       setAppData(data);
     };
+    // TODO confirm/understand these race conditions
     let ignore = false;
     if (ignore) return;
     startFetching();
     ignore = true;
-  }, []);
+  }, [refreshTrigger]);
 
-  // change
-  const itemCardAreaRef = useRef<{ refresh: () => void } | null>(null);
-
-  function refreshItems() {
-    console.log("inside refreshItems", itemCardAreaRef.current);
-    itemCardAreaRef.current?.refresh();
+  function refreshData() {
+    console.log("refreshing");
+    setRefreshTrigger((value) => value + 1);
+    console.log("refresh trigger value: ", refreshTrigger);
   }
-  //
 
   return (
     <div className="bg-gray-100 pb-5 h-full">
       <DataContext.Provider value={appData}>
-        <RefreshContext.Provider value={refreshItems}>
+        <RefreshContext.Provider value={refreshData}>
           <Header></Header>
           <DownloadButtonArea disabled={!haveData}></DownloadButtonArea>
           {haveData ? (
-            <ItemCardArea ref={itemCardAreaRef}></ItemCardArea>
+            <ItemCardArea></ItemCardArea>
           ) : (
             <NoItemsMessage></NoItemsMessage>
           )}

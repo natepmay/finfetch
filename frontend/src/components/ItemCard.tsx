@@ -1,31 +1,20 @@
 import { ItemCardAccount } from "./ItemCardAccount";
 import { ItemHeader } from "./ItemHeader";
-import { getAccounts } from "../api";
-import { Item, Account } from "../../../sharedTypes";
-import { useState, useEffect, useCallback } from "react";
+import { ItemWithAccounts } from "../context/DataContext";
+import { RefreshContext } from "../context/RefreshContext";
+import { useContext } from "react";
 
-export function ItemCard({ item }: { item: Item }) {
-  const [accounts, setAccounts] = useState<Account[]>([]);
+export function ItemCard({ item }: { item: ItemWithAccounts }) {
+  const { accounts } = item;
 
-  const startFetching = useCallback(async () => {
-    const result = await getAccounts(item.itemId);
-    setAccounts(result);
-  }, [item.itemId]);
-
-  useEffect(() => {
-    let ignore = false;
-    if (!ignore) startFetching();
-    return () => {
-      ignore = true;
-    };
-  }, [startFetching]);
+  const refreshData = useContext(RefreshContext);
 
   const accountDisplays = accounts.map((account) => {
     return (
       <ItemCardAccount
         account={account}
         key={account.accountId}
-        refreshAccounts={startFetching}
+        refreshAccounts={refreshData}
       ></ItemCardAccount>
     );
   });
