@@ -15,6 +15,7 @@ function App() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
+    let active = true;
     const startFetching = async () => {
       const items = await getItems();
       const data: ItemWithAccounts[] = await Promise.all(
@@ -23,19 +24,16 @@ function App() {
           accounts: await getAccounts(item.itemId),
         }))
       );
-      setAppData(data);
+      if (active) setAppData(data);
     };
-    // TODO confirm/understand these race conditions
-    let ignore = false;
-    if (ignore) return;
     startFetching();
-    ignore = true;
+    return () => {
+      active = false;
+    };
   }, [refreshTrigger]);
 
   function refreshData() {
-    console.log("refreshing");
     setRefreshTrigger((value) => value + 1);
-    console.log("refresh trigger value: ", refreshTrigger);
   }
 
   return (
