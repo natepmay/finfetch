@@ -1,34 +1,39 @@
 import { ItemCard } from "./ItemCard";
 import { getItems } from "../api";
 import { Item } from "../../../sharedTypes";
-import { useState, useEffect, useImperativeHandle } from "react";
+import { useState, useEffect, useImperativeHandle, useCallback } from "react";
 
 type Ref = {
   ref: React.Ref<{
-    refresh: () => Promise<void>;
+    refresh: () => void;
   }>;
 };
 
 export function ItemCardArea({ ref }: Ref) {
   const [items, setItems] = useState<Item[]>([]);
+  const [refreshIndex, setRefreshIndex] = useState(0);
 
-  async function startFetching() {
-    console.log("fetching");
-    const result = await getItems();
-    setItems(result);
-  }
+  const doRefresh = useCallback(() => {
+    setRefreshIndex((prev) => prev + 1);
+  }, []);
 
   useEffect(() => {
+    async function startFetching() {
+      console.log("fetching");
+      const result = await getItems();
+      setItems(result);
+    }
+
     let ignore = false;
     if (!ignore) startFetching();
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [refreshIndex]);
 
   useImperativeHandle(ref, () => {
     return {
-      refresh: startFetching,
+      refresh: doRefresh,
     };
   });
 

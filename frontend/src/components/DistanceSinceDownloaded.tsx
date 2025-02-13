@@ -11,7 +11,7 @@ export function DistanceSinceDownloaded({
   useEffect(() => {
     if (!lastDownloaded) return;
 
-    const lastDownloadedDate = new Date(lastDownloaded);
+    const lastDownloadedDate = new Date(Number(lastDownloaded));
 
     function updateText() {
       setText(formatDistanceToNow(lastDownloadedDate));

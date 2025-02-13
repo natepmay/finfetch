@@ -1,5 +1,5 @@
 import { createContext } from "react";
 
-export const RefreshContext = createContext<() => Promise<void>>(() =>
+export const RefreshContext = createContext<() => void>(() =>
   Promise.resolve()
 );

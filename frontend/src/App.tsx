@@ -9,11 +9,11 @@ import { RefreshContext } from "./context/RefreshContext";
 
 function App() {
   const haveData = true;
-  const itemCardAreaRef = useRef<{ refresh: () => Promise<void> } | null>(null);
+  const itemCardAreaRef = useRef<{ refresh: () => void } | null>(null);
 
-  async function refreshItems() {
+  function refreshItems() {
     console.log("inside refreshItems", itemCardAreaRef.current);
-    await itemCardAreaRef.current?.refresh();
+    itemCardAreaRef.current?.refresh();
   }
 
   return (
