@@ -1,4 +1,4 @@
-import { Button } from "./Button";
+import { Button } from "./shared/Button";
 import { usePlaidLink, PlaidLinkOnSuccess } from "react-plaid-link";
 import { useCallback, useState, useEffect, useContext } from "react";
 import { RefreshContext } from "../context/RefreshContext";

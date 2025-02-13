@@ -1,7 +1,7 @@
 import { AddItemButtonArea } from "./components/AddItemButtonArea";
 import { DownloadButtonArea } from "./components/DownloadButtonArea";
 import { Header } from "./components/Header";
-import { ItemCardArea } from "./components/ItemCardArea";
+import { ItemCardArea } from "./components/item/ItemCardArea";
 import { NoItemsMessage } from "./components/NoItemsMessage";
 import { getAccounts, getItems } from "./api";
 

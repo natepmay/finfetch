@@ -1,8 +1,8 @@
-import { Modal } from "./Modal";
+import { Modal } from "../shared/Modal";
 import { useState } from "react";
-import { Button } from "./Button";
-import { updateAccount } from "../api";
-import { Account } from "../../../sharedTypes";
+import { Button } from "../shared/Button";
+import { updateAccount } from "../../api";
+import { Account } from "../../../../sharedTypes";
 import { DistanceSinceDownloaded } from "./DistanceSinceDownloaded";
 
 export function ItemCardAccount({

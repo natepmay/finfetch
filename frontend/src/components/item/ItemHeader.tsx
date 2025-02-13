@@ -1,9 +1,9 @@
 import { useState, useContext } from "react";
-import { Modal } from "./Modal";
-import { Button } from "./Button";
-import { deleteItem } from "../api";
-import { Item } from "../../../sharedTypes";
-import { RefreshContext } from "../context/RefreshContext";
+import { Modal } from "../shared/Modal";
+import { Button } from "../shared/Button";
+import { deleteItem } from "../../api";
+import { Item } from "../../../../sharedTypes";
+import { RefreshContext } from "../../context/RefreshContext";
 
 export function ItemHeader({ item }: { item: Item }) {
   type ModalState = "closed" | "removeConfirm";

@@ -1,7 +1,7 @@
 import { ItemCardAccount } from "./ItemCardAccount";
 import { ItemHeader } from "./ItemHeader";
-import { ItemWithAccounts } from "../context/DataContext";
-import { RefreshContext } from "../context/RefreshContext";
+import { ItemWithAccounts } from "../../context/DataContext";
+import { RefreshContext } from "../../context/RefreshContext";
 import { useContext } from "react";
 
 export function ItemCard({ item }: { item: ItemWithAccounts }) {

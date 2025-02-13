@@ -1,6 +1,6 @@
 import { useContext } from "react";
 
-import { Button } from "./Button";
+import { Button } from "./shared/Button";
 import { downloadWrapper } from "../api";
 import { RefreshContext } from "../context/RefreshContext";
 
