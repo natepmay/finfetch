@@ -1,6 +1,7 @@
 import { DB } from "https://deno.land/x/sqlite/mod.ts";
 
 import { Account, ServerItem } from "../sharedTypes.ts";
+import { camelToSnake } from "./utils/pureFns.ts";
 
 /**
  * Create the SQLite tables.
@@ -142,7 +143,7 @@ export function updateAccount(db: DB, accountId: string, resourceIn: Account) {
   const resource: Partial<Account> = { ...resourceIn };
   delete resource.accountId;
 
-  const fields = Object.keys(resource);
+  const fields = Object.keys(resource).map((field) => camelToSnake(field));
   const values = Object.values(resource);
 
   const setClause = fields.map((field) => `${field} = ?`).join(", ");
