@@ -10,7 +10,6 @@ import { RefreshContext } from "./context/RefreshContext";
 import { DataContext, ItemWithAccounts } from "./context/DataContext";
 
 function App() {
-  const haveData = true;
   const [appData, setAppData] = useState([] as ItemWithAccounts[]);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
@@ -37,12 +36,14 @@ function App() {
   }
 
   return (
-    <div className="bg-gray-100 pb-5 h-full">
+    <div className="bg-gray-100 pb-5 min-h-screen">
       <DataContext.Provider value={appData}>
         <RefreshContext.Provider value={refreshData}>
           <Header></Header>
-          <DownloadButtonArea disabled={!haveData}></DownloadButtonArea>
-          {haveData ? (
+          <DownloadButtonArea
+            disabled={appData.length === 0}
+          ></DownloadButtonArea>
+          {appData.length > 0 ? (
             <ItemCardArea></ItemCardArea>
           ) : (
             <NoItemsMessage></NoItemsMessage>
