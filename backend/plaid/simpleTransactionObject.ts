@@ -1,5 +1,7 @@
 import { Transaction } from "npm:plaid";
 
+import { getAccountById } from "../db.ts";
+
 /**
  * A simple object to pass to our database functions that represents the data
  *  our application cares about from the Plaid transaction endpoint
@@ -26,6 +28,7 @@ export class SimpleTransaction {
     this.amount = amount;
     this.currencyCode = currencyCode;
     this.pendingTransactionId = pendingTransactionId;
+    // this.accountNickname = SimpleTransaction.getNickname(accountId);
   }
 
   /**
@@ -47,4 +50,10 @@ export class SimpleTransaction {
       txnObj.pending_transaction_id
     );
   }
+
+  // Uncomment when getAccountById no longer needs a db param
+  // static getNickname(accountId: string) {
+  //   const account = getAccountById(accountId);
+  //   return account.nickname ?? account.name;
+  // }
 }

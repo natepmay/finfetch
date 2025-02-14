@@ -168,3 +168,30 @@ export function deleteItem(db: DB, itemId: string) {
   db.query(`DELETE from items WHERE item_id = ?`, [itemId]);
   return deletedRows.length;
 }
+
+/**
+ * Lookup full info about an account.
+ * @param db
+ * @param accountId
+ * @returns
+ */
+export function getAccountById(db: DB, accountId: string): Account {
+  const accountIdToQuery = accountId;
+
+  const query = `
+  SELECT account_id as accountId, name, nickname, item_id as itemId, last_downloaded as lastDownloaded 
+  FROM accounts
+  WHERE account_id = ?
+  `;
+
+  const results = [];
+
+  for (const [accountId, name, nickname, itemId, lastDownloaded] of db.query(
+    query,
+    [accountIdToQuery]
+  ) as Iterable<[string, string, string, string, number]>) {
+    results.push({ accountId, name, nickname, itemId, lastDownloaded });
+  }
+
+  return results[0];
+}

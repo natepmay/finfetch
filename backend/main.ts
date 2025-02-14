@@ -1,5 +1,7 @@
 import express from "npm:express";
-import { Request, Response, NextFunction } from "npm:@types/express";
+import type { Request, Response, NextFunction } from "npm:express";
+// Express types are being weird in Deno
+// import { Request, Response, NextFunction } from "npm:@types/express";
 import cors from "npm:cors";
 import bodyParser from "npm:body-parser";
 import {
