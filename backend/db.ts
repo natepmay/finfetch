@@ -3,12 +3,14 @@ import { DB } from "https://deno.land/x/sqlite/mod.ts";
 import { Account, ServerItem } from "../sharedTypes.ts";
 import { camelToSnake } from "./utils/pureFns.ts";
 
+const db = new DB("db.db");
+
 /**
  * Create the SQLite tables.
  * @param db SQLite database instance.
  * @returns Nothing.
  */
-export function initDb(db: DB) {
+export function initDb() {
   let itemsAlreadyCreated = false;
 
   try {
@@ -53,10 +55,11 @@ export function initDb(db: DB) {
  * @param db databse instance.
  * @param item
  */
-export function addItem(
-  db: DB,
-  item: { item_id: string; access_token: string; name?: string }
-) {
+export function addItem(item: {
+  item_id: string;
+  access_token: string;
+  name?: string;
+}) {
   db.query("INSERT INTO items (item_id, access_token, name) VALUES(?, ?, ?)", [
     item.item_id,
     item.access_token,
@@ -68,15 +71,12 @@ export function addItem(
  * @param db database instance.
  * @param account
  */
-export function addAccount(
-  db: DB,
-  account: {
-    account_id: string;
-    item_id: string;
-    name?: string;
-    nickname?: string;
-  }
-) {
+export function addAccount(account: {
+  account_id: string;
+  item_id: string;
+  name?: string;
+  nickname?: string;
+}) {
   const { account_id, item_id, name, nickname } = account;
 
   db.query(
@@ -90,7 +90,7 @@ export function addAccount(
  * @param db database instance
  * @returns array of items. Remove access token before sending to client.
  */
-export function getItems(db: DB): ServerItem[] {
+export function getItems(): ServerItem[] {
   const results = [];
 
   for (const [name, itemId, accessToken, cursor] of db.query(
@@ -108,7 +108,7 @@ export function getItems(db: DB): ServerItem[] {
  * @param requestedItemId If blank, get all accounts.
  * @returns List of accounts.
  */
-export function getAccounts(db: DB, requestedItemId?: string): Account[] {
+export function getAccounts(requestedItemId?: string): Account[] {
   const results = [];
 
   let query = `
@@ -137,7 +137,7 @@ export function getAccounts(db: DB, requestedItemId?: string): Account[] {
  * @param resourceIn updated account object. accountId property is used to locate.
  * @returns
  */
-export function updateAccount(db: DB, accountId: string, resourceIn: Account) {
+export function updateAccount(accountId: string, resourceIn: Account) {
   if (accountId !== resourceIn.accountId)
     throw new Error("Account ids don't match.");
   const resource: Partial<Account> = { ...resourceIn };
@@ -161,7 +161,7 @@ export function updateAccount(db: DB, accountId: string, resourceIn: Account) {
  * @param itemId itemId of item to delete.
  * @returns
  */
-export function deleteItem(db: DB, itemId: string) {
+export function deleteItem(itemId: string) {
   const deletedRows = db.query(`DELETE from accounts WHERE item_id = ?`, [
     itemId,
   ]);
@@ -175,7 +175,7 @@ export function deleteItem(db: DB, itemId: string) {
  * @param accountId
  * @returns
  */
-export function getAccountById(db: DB, accountId: string): Account {
+export function getAccountById(accountId: string): Account {
   const accountIdToQuery = accountId;
 
   const query = `

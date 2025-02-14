@@ -11,7 +11,6 @@ import {
   CountryCode,
   Products,
 } from "npm:plaid";
-import { DB } from "https://deno.land/x/sqlite/mod.ts";
 import "jsr:@std/dotenv/load";
 
 import {
@@ -34,8 +33,7 @@ app.use(bodyParser.json());
 // from the same machine by explicitly setting the localhost IP in app.listen() below.
 app.use(cors());
 
-const db = new DB("db.db");
-initDb(db);
+initDb();
 // TODO don't forget to close the db later
 
 const PLAID_CLIENT_ID = Deno.env.get("PLAID_CLIENT_ID");
@@ -62,14 +60,14 @@ const configuration = new Configuration({
 const client = new PlaidApi(configuration);
 
 app.get("/api/sync", async (_: Request, res: Response, next: NextFunction) => {
-  const items = getItems(db);
+  const items = getItems();
   try {
     const csvString = await syncTransactions(client, items);
 
-    const accounts = getAccounts(db);
+    const accounts = getAccounts();
     const now = Date.now();
     accounts.forEach((account) =>
-      updateAccount(db, account.accountId, { ...account, lastDownloaded: now })
+      updateAccount(account.accountId, { ...account, lastDownloaded: now })
     );
 
     res.attachment("combined.csv").send(csvString);
@@ -102,7 +100,7 @@ app.post(
 
 // probably should just be "/api/items"
 app.get("/api/getItems", function (_: Request, res: Response) {
-  const items = getItems(db);
+  const items = getItems();
   const itemsFrontend = items.map((item) => ({
     itemId: item.itemId,
     name: item.name,
@@ -115,7 +113,7 @@ app.get(
   "/api/getAccounts",
   function (req: Request, res: Response) {
     const itemId = req.query.itemId as string;
-    const accounts = getAccounts(db, itemId);
+    const accounts = getAccounts(itemId);
     res.json(accounts);
   }
 );
@@ -132,9 +130,9 @@ app.post(
         public_token: publicToken,
       });
       const { access_token, item_id } = tokenResponse.data;
-      addItem(db, { access_token, item_id, name: metadata.institution?.name });
+      addItem({ access_token, item_id, name: metadata.institution?.name });
       for (const account of metadata.accounts) {
-        addAccount(db, {
+        addAccount({
           account_id: account.id,
           item_id: item_id,
           name: account.name + " " + account.mask,
@@ -157,7 +155,7 @@ app.put(
     try {
       const resource = req.body;
       const { accountId } = req.params;
-      const result = updateAccount(db, accountId, resource);
+      const result = updateAccount(accountId, resource);
       res.json({
         rowsAffected: result,
       });
@@ -172,12 +170,12 @@ app.delete(
   async function (req: Request, res: Response, next: NextFunction) {
     try {
       const { itemId } = req.params;
-      const item = getItems(db).find((item) => item.itemId === itemId);
+      const item = getItems().find((item) => item.itemId === itemId);
       if (!item) throw new Error("Requested item does not exist");
       await client.itemRemove({
         access_token: item.accessToken,
       });
-      deleteItem(db, itemId);
+      deleteItem(itemId);
       res.status(204).send("Deleted");
     } catch (error) {
       next(error);
