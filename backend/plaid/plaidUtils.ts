@@ -28,7 +28,7 @@ async function fetchNewSyncData(
       const results = await client.transactionsSync({
         access_token: item.accessToken,
         options: {
-          include_personal_finance_category: true,
+          include_original_description: true,
         },
         cursor: allData.nextCursor,
       });
