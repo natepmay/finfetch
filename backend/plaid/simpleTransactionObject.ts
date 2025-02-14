@@ -8,9 +8,11 @@ import { getAccountById } from "../db.ts";
  */
 export class SimpleTransaction {
   [key: string]: unknown;
+  public accountNickname: string;
+
   constructor(
     public id: string,
-    public accountId: string,
+    accountId: string,
     public category: string | undefined,
     public date: string,
     public authorizedDate: string | null,
@@ -19,16 +21,7 @@ export class SimpleTransaction {
     public currencyCode: string | null,
     public pendingTransactionId: string | null
   ) {
-    this.id = id;
-    this.accountId = accountId;
-    this.category = category;
-    this.date = date;
-    this.authorizedDate = authorizedDate;
-    this.name = name;
-    this.amount = amount;
-    this.currencyCode = currencyCode;
-    this.pendingTransactionId = pendingTransactionId;
-    // this.accountNickname = SimpleTransaction.getNickname(accountId);
+    this.accountNickname = SimpleTransaction.getNickname(accountId);
   }
 
   /**
@@ -51,9 +44,8 @@ export class SimpleTransaction {
     );
   }
 
-  // Uncomment when getAccountById no longer needs a db param
-  // static getNickname(accountId: string) {
-  //   const account = getAccountById(accountId);
-  //   return account.nickname ?? account.name;
-  // }
+  static getNickname(accountId: string) {
+    const account = getAccountById(accountId);
+    return account.nickname ?? account.name;
+  }
 }
