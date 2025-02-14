@@ -8,8 +8,12 @@ export function DownloadButtonArea({ disabled }: { disabled: boolean }) {
   const refreshData = useContext(RefreshContext);
 
   async function handleOnClick() {
-    await downloadWrapper();
-    refreshData();
+    try {
+      await downloadWrapper();
+      refreshData();
+    } catch (err) {
+      console.log("We errored! ", err);
+    }
   }
 
   return (

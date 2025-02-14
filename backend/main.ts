@@ -59,18 +59,21 @@ const configuration = new Configuration({
 
 const client = new PlaidApi(configuration);
 
-app.get("/api/sync", async (_: Request, res: Response) => {
+app.get("/api/sync", async (_: Request, res: Response, next: NextFunction) => {
   const items = getItems(db);
-  const csvString = await syncTransactions(client, items);
+  try {
+    const csvString = await syncTransactions(client, items);
 
-  // TODO handle error so we don't set a new lastDownloaded if it errored
-  const accounts = getAccounts(db);
-  const now = Date.now();
-  accounts.forEach((account) =>
-    updateAccount(db, account.accountId, { ...account, lastDownloaded: now })
-  );
+    const accounts = getAccounts(db);
+    const now = Date.now();
+    accounts.forEach((account) =>
+      updateAccount(db, account.accountId, { ...account, lastDownloaded: now })
+    );
 
-  res.attachment("combined.csv").send(csvString);
+    res.attachment("combined.csv").send(csvString);
+  } catch (err) {
+    next(err);
+  }
 });
 
 app.post(
@@ -180,6 +183,7 @@ app.delete(
   }
 );
 
+// ENDPOINTS FOR TESTING
 // for testing: get a user token so you can call client.userItemsGet
 app.post("/api/user/1/create", async function (_: Request, res: Response) {
   try {
@@ -200,6 +204,23 @@ app.get("/api/user/1/items", async function (_: Request, res: Response) {
   });
   console.log(data);
   res.json(data);
+});
+
+// reset an item to logged out state
+app.post(
+  "/api/sandbox/item/:accessToken/reset_login",
+  async function (req: Request, res: Response) {
+    const { accessToken } = req.params;
+    const { data } = await client.sandboxItemResetLogin({
+      access_token: accessToken,
+    });
+    res.json(data);
+  }
+);
+
+app.use((err: Error, _: Request, res: Response, __: NextFunction) => {
+  // console.error(err.stack);
+  res.status(500).send(err.message);
 });
 
 // localhost IP set explicitly to prevent access from other devices on the network

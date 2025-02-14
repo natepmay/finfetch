@@ -112,13 +112,9 @@ interface DownloadAndSaveFileOptions extends Options {
 export default async function downloadAndSaveFile(
   options: DownloadAndSaveFileOptions
 ) {
-  try {
-    const { defaultFileName, ...rest } = options;
+  const { defaultFileName, ...rest } = options;
 
-    const { fileName, blob } = await downloadFile(rest);
+  const { fileName, blob } = await downloadFile(rest);
 
-    saveBlob(fileName ?? defaultFileName, blob);
-  } catch (error) {
-    console.log("DOWNLOAD ERROR", error);
-  }
+  saveBlob(fileName ?? defaultFileName, blob);
 }

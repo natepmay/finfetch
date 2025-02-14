@@ -5,7 +5,7 @@ import { ServerItem } from "../../sharedTypes.ts";
 
 async function fetchNewSyncData(
   client: PlaidApi,
-  accessToken: string,
+  item: ServerItem,
   initialCursor: string,
   retriesLeft = 3
 ) {
@@ -16,15 +16,17 @@ async function fetchNewSyncData(
     nextCursor: initialCursor,
   };
   if (retriesLeft <= 0) {
-    console.error("Too many retries!");
+    // console.error("Too many retries!");
     // We're just going to return no data and keep our original cursor. We can try again later.
-    return allData;
+    throw new Error(
+      `We were not able to get the transactions for ${item.name}. Please remove this bank and add it again.`
+    );
   }
   try {
     let keepGoing = false;
     do {
       const results = await client.transactionsSync({
-        access_token: accessToken,
+        access_token: item.accessToken,
         options: {
           include_personal_finance_category: true,
         },
@@ -51,15 +53,10 @@ async function fetchNewSyncData(
     console.log(
       `Oh no! Error! ${JSON.stringify(
         error
-      )} Let's try again from the beginning!`
+      )} Let's try again from the beginning!\n`
     );
     setTimeout(() => {}, 1000);
-    return fetchNewSyncData(
-      client,
-      accessToken,
-      initialCursor,
-      retriesLeft - 1
-    );
+    return fetchNewSyncData(client, item, initialCursor, retriesLeft - 1);
   }
 }
 
@@ -75,7 +72,7 @@ export async function syncTransactions(client: PlaidApi, items: ServerItem[]) {
 
   const eachItemData = await Promise.all(
     items.map(async (item) => {
-      const rawData = await fetchNewSyncData(client, item.accessToken, "");
+      const rawData = await fetchNewSyncData(client, item, "");
       return {
         added: simplifyTransactions(rawData.added),
         removed: rawData.removed,
