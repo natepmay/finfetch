@@ -38,7 +38,7 @@ export async function getAccounts(itemId: string): Promise<Account[]> {
 export async function downloadWrapper(): Promise<void> {
   await downloadAndSaveFile({
     url: `${BASE_BACKEND_URL}/api/sync`,
-    defaultFileName: "default-download.csv",
+    defaultFileName: "transactions.csv",
   });
 }
 
