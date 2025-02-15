@@ -2,79 +2,40 @@ import { Transaction } from "npm:plaid";
 
 import { getAccountById } from "../db.ts";
 
-/**
- * A simple object to pass to our database functions that represents the data
- *  our application cares about from the Plaid transaction endpoint
- */
-export class SimpleTransaction {
-  [key: string]: unknown;
-  public accountNickname: string;
-
-  constructor(
-    public id: string,
-    accountId: string,
-    public category: string | undefined,
-    public date: string,
-    public authorizedDate: string | null,
-    public name: string | null | undefined,
-    public amount: number,
-    public currencyCode: string | null,
-    public pendingTransactionId: string | null
-  ) {
-    this.accountNickname = SimpleTransaction.getNickname(accountId);
-  }
-
-  /**
-   * Static factory method for creating the SimpleTransaction object
-   *
-   * @param {import("plaid").Transaction} txnObj The transaction object returned from the Plaid API
-   * @returns SimpleTransaction
-   */
-  static fromPlaidTransaction(txnObj: Transaction) {
-    return new SimpleTransaction(
-      txnObj.transaction_id,
-      txnObj.account_id,
-      txnObj.personal_finance_category?.primary,
-      txnObj.date,
-      txnObj.authorized_date,
-      txnObj.merchant_name,
-      txnObj.amount,
-      txnObj.iso_currency_code,
-      txnObj.pending_transaction_id
-    );
-  }
-
-  static getNickname(accountId: string) {
-    const account = getAccountById(accountId);
-    return account.nickname ?? account.name;
-  }
-}
-
-const transactionFieldsForHumans = {
-  accountNickname: {
-    text: "Account",
-    order: 3,
-  },
-  id: "Transaction ID",
-  category: "Category",
-  date: "Transaction Date",
-  authorizedDate: "Authorized Date",
+const getNickname = (accountId: string) => {
+  const account = getAccountById(accountId);
+  return account.nickname ?? account.name;
 };
 
-// also include
-// pending
-// original_description
-// personal_finance_category.primary
-// ".detailed
-// ".confidence_level
+export function processTransaction(txnObj: Transaction) {
+  const newObj: { [key: string]: string } = {};
 
-/*
+  const deprecated = new Set([
+    "category",
+    "category_id",
+    "transaction_type",
+    "counterparties",
+  ]);
 
-Order:
-1. authorized_date  Date of Transaction
-2. date             Date Posted or Pending
-3. 
+  newObj.account_nickname = getNickname(txnObj.account_id);
 
-ON SECOND THOUGHT JUST DUMP EVERYTHING. IT'S DATA. IF YOU DON'T LIKE IT DON'T USE IT.
+  for (const [key, value] of Object.entries(txnObj)) {
+    if (deprecated.has(key)) continue;
+    // need nullish test first because null is of type object
+    if (!value) {
+      newObj[key] = "";
+    } else if (typeof value === "object") {
+      for (const [nestedKey, nestedValue] of Object.entries(value)) {
+        newObj[key + "-" + nestedKey] = nestedValue ? String(nestedValue) : "";
+      }
+    } else if (["string", "number"].includes(typeof value)) {
+      newObj[key] = value ? String(value) : "";
+    } else {
+      throw new Error(
+        `Transaction object includes an unexpected type. Type: ${typeof value}`
+      );
+    }
+  }
 
-*/
+  return newObj;
+}

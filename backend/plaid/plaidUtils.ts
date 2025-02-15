@@ -1,5 +1,5 @@
 import { RemovedTransaction, Transaction, PlaidApi } from "npm:plaid";
-import { SimpleTransaction } from "./simpleTransactionObject.ts";
+import { processTransaction } from "./simpleTransactionObject.ts";
 import { stringify } from "jsr:@std/csv";
 import { ServerItem } from "../../sharedTypes.ts";
 
@@ -61,9 +61,9 @@ async function fetchNewSyncData(
 }
 
 export async function syncTransactions(client: PlaidApi, items: ServerItem[]) {
-  const simplifyTransactions = (transactions: Transaction[]) => {
+  const processAllTransactions = (transactions: Transaction[]) => {
     return transactions.map((transaction: Transaction) => {
-      return SimpleTransaction.fromPlaidTransaction(transaction);
+      return processTransaction(transaction);
     });
   };
 
@@ -74,18 +74,25 @@ export async function syncTransactions(client: PlaidApi, items: ServerItem[]) {
     items.map(async (item) => {
       const rawData = await fetchNewSyncData(client, item, "");
       return {
-        added: simplifyTransactions(rawData.added),
+        added: processAllTransactions(rawData.added),
         removed: rawData.removed,
-        modified: simplifyTransactions(rawData.modified),
+        modified: processAllTransactions(rawData.modified),
       };
     })
   );
 
-  const combinedData = eachItemData.reduce((acc, data) => ({
-    added: [...acc.added, ...data.added],
-    removed: [...acc.removed, ...data.removed],
-    modified: [...acc.modified, ...data.modified],
-  }));
+  const combinedData = eachItemData.reduce(
+    (acc, data) => ({
+      added: [...acc.added, ...data.added],
+      removed: [...acc.removed, ...data.removed],
+      modified: [...acc.modified, ...data.modified],
+    }),
+    {
+      added: [],
+      removed: [],
+      modified: [],
+    }
+  );
 
   const csvString = stringify(combinedData.added, {
     columns: Object.keys(combinedData.added[0]),

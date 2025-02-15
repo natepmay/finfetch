@@ -1,9 +1,11 @@
 import { DB } from "https://deno.land/x/sqlite/mod.ts";
+import * as path from "jsr:@std/path";
 
 import { Account, ServerItem } from "../sharedTypes.ts";
 import { camelToSnake } from "./utils/pureFns.ts";
 
-const db = new DB("db.db");
+const dbPath = path.resolve(import.meta.dirname || "", "db.db");
+const db = new DB(dbPath);
 
 /**
  * Create the SQLite tables.

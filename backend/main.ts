@@ -219,7 +219,7 @@ app.post(
 );
 
 app.use((err: Error, _: Request, res: Response, __: NextFunction) => {
-  // console.error(err.stack);
+  console.error(err.stack);
   res.status(500).send(err.message);
 });
 

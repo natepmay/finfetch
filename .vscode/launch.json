@@ -9,7 +9,7 @@
       "name": "Launch Program",
       "type": "node",
       "program": "${workspaceFolder}/backend/main.ts",
-      "cwd": "${workspaceFolder}",
+      "cwd": "${workspaceFolder}/backend",
       "env": {},
       "runtimeExecutable": "/home/nate/.deno/bin/deno",
       "runtimeArgs": ["run", "--inspect-wait", "--allow-all"],
