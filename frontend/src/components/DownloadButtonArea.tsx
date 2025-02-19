@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { ChangeEvent, useContext, useState } from "react";
 
 import { Button } from "./shared/Button";
 import { Modal } from "./shared/Modal";
@@ -11,6 +11,7 @@ export function DownloadButtonArea({ disabled }: { disabled: boolean }) {
   const refreshData = useContext(RefreshContext);
   const [modalState, setModalState] = useState("hidden" as ModalState);
   const [errorMessage, setErrorMessage] = useState(null as string | null);
+  const [dateQuery, setDateQuery] = useState("cursor");
 
   async function handleOnClick() {
     try {
@@ -22,10 +23,34 @@ export function DownloadButtonArea({ disabled }: { disabled: boolean }) {
     }
   }
 
+  function handleChange(e: ChangeEvent<HTMLInputElement>) {
+    setDateQuery(e.target.value);
+  }
+
   return (
-    <div className="flex justify-center m-5">
+    <div className="flex flex-col items-center m-5">
+      <div className="flex gap-2 mb-4">
+        <input
+          type="radio"
+          name="date-query"
+          id="query-all"
+          value="all"
+          checked={dateQuery === "all"}
+          onChange={handleChange}
+        />
+        <label htmlFor="query-all"> Last 2 years</label>
+        <input
+          type="radio"
+          name="date-query"
+          id="query-cursor"
+          value="cursor"
+          checked={dateQuery === "cursor"}
+          onChange={handleChange}
+        />
+        <label htmlFor="query-cursor">Since last download</label>
+      </div>
       <Button onClick={handleOnClick} disabled={disabled}>
-        Download All
+        Download
       </Button>
       <Modal
         isOpen={modalState === "error"}
