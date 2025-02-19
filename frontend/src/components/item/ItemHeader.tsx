@@ -1,4 +1,5 @@
 import { useState, useContext } from "react";
+import { Trash2 } from "lucide-react";
 import { Modal } from "../shared/Modal";
 import { Button } from "../shared/Button";
 import { deleteItem } from "../../api";
@@ -21,12 +22,13 @@ export function ItemHeader({ item }: { item: Item }) {
     <>
       <header className="border-b-2 border-b-gray-200 pb-2 flex justify-between items-center">
         <h2 className="text-2xl text-blue-700 font-black">{item.name}</h2>
-        <a
+        <button
           className="text-blue-600 text-xs underline cursor-pointer"
           onClick={() => setModalState("removeConfirm")}
         >
-          Remove
-        </a>
+          <Trash2 strokeWidth={1.5} size={20} />
+          <span className="sr-only">Remove</span>
+        </button>
       </header>
       <Modal
         isOpen={modalState === "removeConfirm"}

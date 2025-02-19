@@ -1,5 +1,6 @@
 import { Modal } from "../shared/Modal";
 import { useState } from "react";
+import { SquarePen } from "lucide-react";
 import { Button } from "../shared/Button";
 import { updateAccount } from "../../api";
 import { Account } from "../../../../sharedTypes";
@@ -37,14 +38,15 @@ export function ItemCardAccount({
       <div className="grid grid-cols-2 my-3">
         <div className="flex flex-col items-center">
           <div className="text-sm font-bold">Nickname</div>
-          <div className="text-lg font-light text-center">
+          <div className="text-lg font-light text-center flex items-center gap-1">
             {nickname}{" "}
-            <a
+            <button
               className="text-blue-600 text-xs underline ml-1 cursor-pointer"
               onClick={() => setIsModalOpen(true)}
             >
-              Edit
-            </a>
+              <SquarePen strokeWidth={1.5} size={16} />
+              <span className="sr-only">Edit</span>
+            </button>
           </div>
         </div>
         <div className="flex flex-col items-center">

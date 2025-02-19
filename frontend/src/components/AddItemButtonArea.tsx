@@ -1,4 +1,5 @@
 import { Button } from "./shared/Button";
+import { Plus } from "lucide-react";
 import { usePlaidLink, PlaidLinkOnSuccess } from "react-plaid-link";
 import { useCallback, useState, useEffect, useContext } from "react";
 import { RefreshContext } from "../context/RefreshContext";
@@ -61,7 +62,10 @@ export function AddItemButtonArea() {
   return (
     <div className="flex justify-center m-5">
       <Button disabled={!ready} onClick={() => open()}>
-        Add a Bank
+        <span className="flex items-center gap-2">
+          <Plus strokeWidth={1.5} />
+          Add a Bank
+        </span>
       </Button>
     </div>
   );

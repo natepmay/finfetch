@@ -1,4 +1,5 @@
 import { ChangeEvent, useContext, useState } from "react";
+import { ArrowDownToLine } from "lucide-react";
 
 import { Button } from "./shared/Button";
 import { Modal } from "./shared/Modal";
@@ -50,7 +51,9 @@ export function DownloadButtonArea({ disabled }: { disabled: boolean }) {
         <label htmlFor="query-cursor">Since last download</label>
       </div>
       <Button onClick={handleOnClick} disabled={disabled}>
-        Download
+        <span className="flex items-center gap-2">
+          <ArrowDownToLine strokeWidth={1.5} /> Download
+        </span>
       </Button>
       <Modal
         isOpen={modalState === "error"}
