@@ -99,6 +99,24 @@ export async function syncTransactions(
   );
 
   // TODO test to see if there's any data. if not there won't be any column names, so just don't make that file. if there's no data from any file, let the user know
+  const makeCsvString = (dataIn: { [key: string]: string }) => {
+    stringify(dataIn, {
+      columns: Object.keys(dataIn[0]),
+    });
+  };
+
+  const txnCount = {};
+  const csvStrings = {};
+
+  Object.keys(combinedData).forEach((category) => {
+    const thisTxnCount = combinedData[category].length;
+    txnCount[category] = thisTxnCount;
+
+    if (thisTxnCount > 0) {
+      csvStrings[category] = makeCsvString(combinedData[category]);
+    }
+  });
+
   // TODO return an object with total number added, removed, and modified so that can be displayed to the user
   const csvString = stringify(combinedData.added, {
     columns: Object.keys(combinedData.added[0]),
