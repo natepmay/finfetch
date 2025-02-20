@@ -66,7 +66,7 @@ app.get(
     const { dateQuery }: { dateQuery: "cursor" | "all" } = req.query;
 
     try {
-      const csvString = await syncTransactions(
+      const { csvStrings, txnCount } = await syncTransactions(
         client,
         items,
         dateQuery === "cursor"
@@ -78,7 +78,7 @@ app.get(
         updateAccount(account.accountId, { ...account, lastDownloaded: now })
       );
 
-      res.attachment("combined.csv").send(csvString);
+      res.attachment("combined.csv").send(csvStrings.added);
     } catch (err) {
       next(err);
     }

@@ -85,7 +85,12 @@ export async function syncTransactions(
     })
   );
 
-  const combinedData = eachItemData.reduce(
+  type Category = "added" | "removed" | "modified";
+
+  const combinedData: Record<
+    Category,
+    { [key: string]: string }[] | RemovedTransaction[]
+  > = eachItemData.reduce(
     (acc, data) => ({
       added: [...acc.added, ...data.added],
       removed: [...acc.removed, ...data.removed],
@@ -98,33 +103,33 @@ export async function syncTransactions(
     }
   );
 
-  // TODO test to see if there's any data. if not there won't be any column names, so just don't make that file. if there's no data from any file, let the user know
-  const makeCsvString = (dataIn: { [key: string]: string }) => {
-    stringify(dataIn, {
+  const makeCsvString = (
+    dataIn: RemovedTransaction[] | { [key: string]: string }[]
+  ) => {
+    return stringify(dataIn as { [key: string]: string }[], {
       columns: Object.keys(dataIn[0]),
     });
   };
 
-  const txnCount = {};
-  const csvStrings = {};
+  const txnCount: Record<Category, number> = {
+    added: 0,
+    removed: 0,
+    modified: 0,
+  };
+  const csvStrings: Record<Category, string | null> = {
+    added: null,
+    removed: null,
+    modified: null,
+  };
 
-  Object.keys(combinedData).forEach((category) => {
-    const thisTxnCount = combinedData[category].length;
+  for (const category of Object.keys(combinedData) as Category[]) {
+    const thisTxnCount = combinedData[category as Category].length;
     txnCount[category] = thisTxnCount;
 
     if (thisTxnCount > 0) {
       csvStrings[category] = makeCsvString(combinedData[category]);
     }
-  });
+  }
 
-  // TODO return an object with total number added, removed, and modified so that can be displayed to the user
-  const csvString = stringify(combinedData.added, {
-    columns: Object.keys(combinedData.added[0]),
-  });
-
-  // await Deno.writeTextFile("./out/added.csv", csvString);
-  // TODO support removed (maybe just reverse the transaction?), modified
-  // explore the import in hledger to see what would make sense as default
-
-  return csvString;
+  return { txnCount, csvStrings };
 }
