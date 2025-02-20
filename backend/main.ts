@@ -198,7 +198,7 @@ app.post("/api/user/1/create", async function (_: Request, res: Response) {
 
 app.get(
   "/api/item/:accessToken",
-  async function (req: Request, res: Response, next: NextFunction) {
+  async function (req: Request, res: Response, _: NextFunction) {
     const { accessToken } = req.params;
     const resp = await client.itemGet({ access_token: accessToken });
     console.log(resp.data);

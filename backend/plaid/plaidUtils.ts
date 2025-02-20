@@ -1,5 +1,6 @@
 import { RemovedTransaction, Transaction, PlaidApi } from "npm:plaid";
 import { processTransaction } from "./simpleTransactionObject.ts";
+import { updateItem } from "../db.ts";
 import { stringify } from "jsr:@std/csv";
 import { ServerItem } from "../../sharedTypes.ts";
 
@@ -67,12 +68,10 @@ export async function syncTransactions(client: PlaidApi, items: ServerItem[]) {
     });
   };
 
-  // TODO get the cursor for each item and store it
-  // TODO currently we add the account id but we want the account name
-
   const eachItemData = await Promise.all(
     items.map(async (item) => {
       const rawData = await fetchNewSyncData(client, item, "");
+      updateItem(item.itemId, { ...item, cursor: rawData.nextCursor });
       return {
         added: processAllTransactions(rawData.added),
         removed: rawData.removed,

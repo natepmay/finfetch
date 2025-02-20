@@ -1,7 +1,7 @@
 import { DB } from "https://deno.land/x/sqlite/mod.ts";
 import * as path from "jsr:@std/path";
 
-import { Account, ServerItem } from "../sharedTypes.ts";
+import { Account, Item, ServerItem } from "../sharedTypes.ts";
 import { camelToSnake } from "./utils/pureFns.ts";
 
 const dbPath = path.resolve(import.meta.dirname || "", "db.db");
@@ -152,6 +152,23 @@ export function updateAccount(accountId: string, resourceIn: Account) {
   const sql = `UPDATE accounts SET ${setClause} WHERE account_id = ?`;
 
   db.query(sql, [...values, accountId]);
+
+  // TODO return something that's not this
+  return 1;
+}
+
+export function updateItem(itemId: string, resourceIn: ServerItem) {
+  if (itemId !== resourceIn.itemId) throw new Error("Item ids don't match.");
+  const resource: Partial<Item> = { ...resourceIn };
+  delete resource.itemId;
+
+  const fields = Object.keys(resource).map((field) => camelToSnake(field));
+  const values = Object.values(resource);
+
+  const setClause = fields.map((field) => `${field} = ?`).join(", ");
+  const sql = `UPDATE items SET ${setClause} WHERE item_id = ?`;
+
+  db.query(sql, [...values, itemId]);
 
   // TODO return something that's not this
   return 1;

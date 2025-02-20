@@ -28,11 +28,11 @@ export function processTransaction(txnObj: Transaction) {
       for (const [nestedKey, nestedValue] of Object.entries(value)) {
         newObj[key + "-" + nestedKey] = nestedValue ? String(nestedValue) : "";
       }
-    } else if (["string", "number"].includes(typeof value)) {
+    } else if (["string", "number", "boolean"].includes(typeof value)) {
       newObj[key] = value ? String(value) : "";
     } else {
       throw new Error(
-        `Transaction object includes an unexpected type. Type: ${typeof value}`
+        `Transaction object includes an unexpected type. Type: ${typeof value}. Key: ${key}. Value: ${value}`
       );
     }
   }

@@ -5,6 +5,7 @@ export interface Item {
 
 export interface ServerItem extends Item {
   accessToken: string;
+  cursor: string;
 }
 
 export interface Account {
