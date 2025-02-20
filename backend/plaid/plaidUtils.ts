@@ -61,7 +61,11 @@ async function fetchNewSyncData(
   }
 }
 
-export async function syncTransactions(client: PlaidApi, items: ServerItem[]) {
+export async function syncTransactions(
+  client: PlaidApi,
+  items: ServerItem[],
+  useCursor: boolean
+) {
   const processAllTransactions = (transactions: Transaction[]) => {
     return transactions.map((transaction: Transaction) => {
       return processTransaction(transaction);
@@ -70,7 +74,8 @@ export async function syncTransactions(client: PlaidApi, items: ServerItem[]) {
 
   const eachItemData = await Promise.all(
     items.map(async (item) => {
-      const rawData = await fetchNewSyncData(client, item, "");
+      const cursor = useCursor ? item.cursor : "";
+      const rawData = await fetchNewSyncData(client, item, cursor);
       updateItem(item.itemId, { ...item, cursor: rawData.nextCursor });
       return {
         added: processAllTransactions(rawData.added),
@@ -93,6 +98,8 @@ export async function syncTransactions(client: PlaidApi, items: ServerItem[]) {
     }
   );
 
+  // TODO test to see if there's any data. if not there won't be any column names, so just don't make that file. if there's no data from any file, let the user know
+  // TODO return an object with total number added, removed, and modified so that can be displayed to the user
   const csvString = stringify(combinedData.added, {
     columns: Object.keys(combinedData.added[0]),
   });

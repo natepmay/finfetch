@@ -59,22 +59,31 @@ const configuration = new Configuration({
 
 const client = new PlaidApi(configuration);
 
-app.get("/api/sync", async (_: Request, res: Response, next: NextFunction) => {
-  const items = getItems();
-  try {
-    const csvString = await syncTransactions(client, items);
+app.get(
+  "/api/sync",
+  async (req: Request, res: Response, next: NextFunction) => {
+    const items = getItems();
+    const { dateQuery }: { dateQuery: "cursor" | "all" } = req.query;
 
-    const accounts = getAccounts();
-    const now = Date.now();
-    accounts.forEach((account) =>
-      updateAccount(account.accountId, { ...account, lastDownloaded: now })
-    );
+    try {
+      const csvString = await syncTransactions(
+        client,
+        items,
+        dateQuery === "cursor"
+      );
 
-    res.attachment("combined.csv").send(csvString);
-  } catch (err) {
-    next(err);
+      const accounts = getAccounts();
+      const now = Date.now();
+      accounts.forEach((account) =>
+        updateAccount(account.accountId, { ...account, lastDownloaded: now })
+      );
+
+      res.attachment("combined.csv").send(csvString);
+    } catch (err) {
+      next(err);
+    }
   }
-});
+);
 
 app.post(
   "/api/create_link_token",

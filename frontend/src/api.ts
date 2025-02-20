@@ -35,9 +35,11 @@ export async function getAccounts(itemId: string): Promise<Account[]> {
 /**
  * Call the sync endpoint and downloads the file.
  */
-export async function downloadWrapper(): Promise<void> {
+export async function downloadWrapper(
+  dateQuery: "cursor" | "all"
+): Promise<void> {
   await downloadAndSaveFile({
-    url: `${BASE_BACKEND_URL}/api/sync`,
+    url: `${BASE_BACKEND_URL}/api/sync?dateQuery=${dateQuery}`,
     defaultFileName: "transactions.csv",
   });
 }

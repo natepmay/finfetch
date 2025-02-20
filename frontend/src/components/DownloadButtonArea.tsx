@@ -12,11 +12,11 @@ export function DownloadButtonArea({ disabled }: { disabled: boolean }) {
   const refreshData = useContext(RefreshContext);
   const [modalState, setModalState] = useState("hidden" as ModalState);
   const [errorMessage, setErrorMessage] = useState(null as string | null);
-  const [dateQuery, setDateQuery] = useState("cursor");
+  const [dateQuery, setDateQuery] = useState("cursor" as "cursor" | "all");
 
   async function handleOnClick() {
     try {
-      await downloadWrapper();
+      await downloadWrapper(dateQuery);
       refreshData();
     } catch (err) {
       setErrorMessage((err as Error).message);
@@ -25,7 +25,7 @@ export function DownloadButtonArea({ disabled }: { disabled: boolean }) {
   }
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
-    setDateQuery(e.target.value);
+    setDateQuery(e.target.value as "cursor" | "all");
   }
 
   return (
