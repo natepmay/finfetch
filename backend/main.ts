@@ -183,7 +183,7 @@ app.delete(
   }
 );
 
-// ENDPOINTS FOR TESTING
+// ------ BEGIN ENDPOINTS FOR TESTING
 // for testing: get a user token so you can call client.userItemsGet
 app.post("/api/user/1/create", async function (_: Request, res: Response) {
   try {
@@ -195,6 +195,16 @@ app.post("/api/user/1/create", async function (_: Request, res: Response) {
     res.status(400).send("error");
   }
 });
+
+app.get(
+  "/api/item/:accessToken",
+  async function (req: Request, res: Response, next: NextFunction) {
+    const { accessToken } = req.params;
+    const resp = await client.itemGet({ access_token: accessToken });
+    console.log(resp.data);
+    res.json(resp.data);
+  }
+);
 
 // for testing: add your user token here when it's returned from client.userCreate
 const USER_TOKEN = "";
@@ -217,6 +227,7 @@ app.post(
     res.json(data);
   }
 );
+// --------- END EDPOINTS FOR TESTING
 
 app.use((err: Error, _: Request, res: Response, __: NextFunction) => {
   console.error(err.stack);
