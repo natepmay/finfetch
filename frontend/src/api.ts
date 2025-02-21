@@ -32,17 +32,29 @@ export async function getAccounts(itemId: string): Promise<Account[]> {
   return data;
 }
 
+export interface TxnCount {
+  added: number;
+  removed: number;
+  modified: number;
+}
+
 /**
  * Call the sync endpoint and downloads the file.
  */
 export async function downloadWrapper(
   dateQuery: "cursor" | "all"
-): Promise<void> {
-  const txnCount = await downloadAndSaveFile({
+): Promise<TxnCount> {
+  const txnCountRaw = await downloadAndSaveFile({
     url: `${BASE_BACKEND_URL}/api/sync?dateQuery=${dateQuery}`,
     defaultFileName: "transactions.zip",
   });
-  console.log("txnCount: ", txnCount);
+
+  const txnCount = {} as TxnCount;
+  Object.entries(txnCountRaw).forEach(([category, number]) => {
+    const typedCategory = category as keyof TxnCount;
+    txnCount[typedCategory] = number ? Number(number) : 0;
+  });
+  return txnCount;
 }
 
 /**

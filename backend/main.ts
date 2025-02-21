@@ -12,7 +12,6 @@ import {
   Products,
 } from "npm:plaid";
 import "jsr:@std/dotenv/load";
-import { Buffer } from "jsr:@std/streams/buffer";
 import * as zip from "jsr:@zip-js/zip-js";
 
 import {
@@ -82,8 +81,6 @@ app.get(
 
       const zipFileWriter = new zip.BlobWriter("application/zip");
       const zipWriter = new zip.ZipWriter(zipFileWriter);
-
-      // await zipWriter.add("added.csv", new zip.TextReader(csvStrings.added!));
 
       await Promise.all(
         Object.entries(csvStrings).map(([category, csv]) => {

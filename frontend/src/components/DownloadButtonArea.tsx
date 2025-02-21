@@ -3,21 +3,28 @@ import { ArrowDownToLine } from "lucide-react";
 
 import { Button } from "./shared/Button";
 import { Modal } from "./shared/Modal";
-import { downloadWrapper } from "../api";
+import { downloadWrapper, TxnCount } from "../api";
 import { RefreshContext } from "../context/RefreshContext";
 
-type ModalState = "hidden" | "error";
+type ModalState = "hidden" | "error" | "success";
 
 export function DownloadButtonArea({ disabled }: { disabled: boolean }) {
   const refreshData = useContext(RefreshContext);
   const [modalState, setModalState] = useState("hidden" as ModalState);
   const [errorMessage, setErrorMessage] = useState(null as string | null);
   const [dateQuery, setDateQuery] = useState("cursor" as "cursor" | "all");
+  const [txnCount, setTxnCount] = useState({
+    added: 0,
+    removed: 0,
+    modified: 0,
+  } as TxnCount);
 
   async function handleOnClick() {
     try {
-      await downloadWrapper(dateQuery);
+      const txnsRaw = await downloadWrapper(dateQuery);
+      setTxnCount(txnsRaw);
       refreshData();
+      setModalState("success");
     } catch (err) {
       setErrorMessage((err as Error).message);
       setModalState("error");
@@ -55,6 +62,7 @@ export function DownloadButtonArea({ disabled }: { disabled: boolean }) {
           <ArrowDownToLine strokeWidth={1.5} /> Download
         </span>
       </Button>
+
       <Modal
         isOpen={modalState === "error"}
         onClose={() => setModalState("hidden")}
@@ -62,6 +70,28 @@ export function DownloadButtonArea({ disabled }: { disabled: boolean }) {
         <div className="flex flex-col max-w-md">
           <h2 className="font-bold text-lg mb-4">Error</h2>
           <div className="mb-4">{errorMessage}</div>
+          <Button type="submit" onClick={() => setModalState("hidden")}>
+            Okay
+          </Button>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={modalState === "success"}
+        onClose={() => setModalState("hidden")}
+      >
+        <div className="flex flex-col max-w-md">
+          <h2 className="font-bold text-lg mb-4">Success</h2>
+          <div className="mb-4">
+            {Object.values(txnCount).every((num) => num === 0) ? (
+              <>No new transactions.</>
+            ) : (
+              <>
+                Transactions added: {txnCount.added}, removed:{" "}
+                {txnCount.removed}, modified: {txnCount.modified}.
+              </>
+            )}
+          </div>
           <Button type="submit" onClick={() => setModalState("hidden")}>
             Okay
           </Button>
