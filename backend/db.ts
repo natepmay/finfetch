@@ -49,6 +49,18 @@ export function initDb() {
     );
   }
 
+  try {
+    db.execute(`
+      CREATE TABLE users (
+        user_id NUMBER PRIMARY KEY,
+        salt BLOB NOT NULL
+      );
+    `);
+    console.log("success!");
+  } catch (_) {
+    console.log("Users is already created :-) or maybe there's an error :-(");
+  }
+
   if (itemsAlreadyCreated) return;
 }
 
@@ -213,4 +225,8 @@ export function getAccountById(accountId: string): Account {
   }
 
   return results[0];
+}
+
+export function addSalt(salt: Uint8Array) {
+  db.query("REPLACE INTO users (user_id, salt) VALUES(1, ?)", [salt]);
 }

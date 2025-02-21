@@ -22,6 +22,7 @@ import {
   getAccounts,
   deleteItem,
   updateAccount,
+  addSalt,
 } from "./db.ts";
 import { PlaidLinkOnSuccessMetadata } from "./types.ts";
 import { syncTransactions } from "./plaid/plaidUtils.ts";
@@ -217,6 +218,19 @@ app.delete(
       });
       deleteItem(itemId);
       res.status(204).send("Deleted");
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+app.post(
+  "/api/users/create",
+  function (_: Request, res: Response, next: NextFunction) {
+    try {
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      addSalt(salt);
+      res.end(salt);
     } catch (error) {
       next(error);
     }
