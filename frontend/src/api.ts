@@ -1,5 +1,6 @@
-import downloadAndSaveFile from "./download";
+import downloadAndSaveFile from "./utils/download.ts";
 import { Item, Account } from "../../sharedTypes.ts";
+import { deriveKey } from "./utils/crypto.ts";
 
 const BASE_BACKEND_URL = "http://localhost:3002";
 
@@ -84,3 +85,22 @@ export async function deleteItem(itemId: string) {
     throw new Error(String(error));
   }
 }
+
+export async function initUser(password: string) {
+  const resp = await fetch(`${BASE_BACKEND_URL}/api/users/create`, {
+    method: "POST",
+  });
+  const arrayBuffer = await resp.arrayBuffer();
+  const salt = new Uint8Array(arrayBuffer);
+
+  const cryptoKey = await deriveKey(password, salt);
+
+  // To test:
+  // const { iv, encrypted } = await encryptData("hey hey hey", cryptoKey);
+  // const decrypted = await decryptData(encrypted, iv, cryptoKey);
+  // console.log(decrypted);
+
+  return cryptoKey;
+}
+
+await initUser("balbalbala");
