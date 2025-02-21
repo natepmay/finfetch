@@ -92,6 +92,12 @@ export async function downloadFile(options: Options) {
 
   const type = response.headers.get("content-type")?.split(";")[0];
 
+  const txnCount = {
+    added: response.headers.get("x-addedcount"),
+    modified: response.headers.get("x-modifiedcount"),
+    removed: response.headers.get("x-removedcount"),
+  };
+
   // It is necessary to create a new blob object with mime-type explicitly set for all browsers except Chrome, but it works for Chrome too.
   const blob = new Blob(chunks, { type });
 
@@ -102,6 +108,7 @@ export async function downloadFile(options: Options) {
   return {
     fileName,
     blob,
+    txnCount,
   };
 }
 
@@ -114,7 +121,9 @@ export default async function downloadAndSaveFile(
 ) {
   const { defaultFileName, ...rest } = options;
 
-  const { fileName, blob } = await downloadFile(rest);
+  const { fileName, blob, txnCount } = await downloadFile(rest);
 
   saveBlob(fileName ?? defaultFileName, blob);
+
+  return txnCount;
 }

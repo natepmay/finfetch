@@ -9,7 +9,9 @@
     "jsr:@std/expect@*": "1.0.13",
     "jsr:@std/internal@^1.0.5": "1.0.5",
     "jsr:@std/path@*": "1.0.8",
+    "jsr:@std/streams@*": "1.0.8",
     "jsr:@std/streams@^1.0.4": "1.0.8",
+    "jsr:@zip-js/zip-js@*": "2.7.57",
     "npm:@types/express@*": "5.0.0",
     "npm:body-parser@*": "1.20.3",
     "npm:cors@*": "2.8.5",
@@ -35,7 +37,7 @@
     "@std/csv@1.0.3": {
       "integrity": "623acf0dcb88d62ba727c3611ad005df7f109ede8cac833e3986f540744562e5",
       "dependencies": [
-        "jsr:@std/streams"
+        "jsr:@std/streams@^1.0.4"
       ]
     },
     "@std/dotenv@0.225.2": {
@@ -59,6 +61,9 @@
       "dependencies": [
         "jsr:@std/bytes"
       ]
+    },
+    "@zip-js/zip-js@2.7.57": {
+      "integrity": "15465ff627e321775870ad493bc043ca2d97940bda58d709c49908d39f4b0524"
     }
   },
   "npm": {

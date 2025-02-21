@@ -38,10 +38,11 @@ export async function getAccounts(itemId: string): Promise<Account[]> {
 export async function downloadWrapper(
   dateQuery: "cursor" | "all"
 ): Promise<void> {
-  await downloadAndSaveFile({
+  const txnCount = await downloadAndSaveFile({
     url: `${BASE_BACKEND_URL}/api/sync?dateQuery=${dateQuery}`,
-    defaultFileName: "transactions.csv",
+    defaultFileName: "transactions.zip",
   });
+  console.log("txnCount: ", txnCount);
 }
 
 /**

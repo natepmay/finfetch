@@ -12,6 +12,8 @@ import {
   Products,
 } from "npm:plaid";
 import "jsr:@std/dotenv/load";
+import { Buffer } from "jsr:@std/streams/buffer";
+import * as zip from "jsr:@zip-js/zip-js";
 
 import {
   initDb,
@@ -78,7 +80,39 @@ app.get(
         updateAccount(account.accountId, { ...account, lastDownloaded: now })
       );
 
-      res.attachment("combined.csv").send(csvStrings.added);
+      const zipFileWriter = new zip.BlobWriter("application/zip");
+      const zipWriter = new zip.ZipWriter(zipFileWriter);
+
+      // await zipWriter.add("added.csv", new zip.TextReader(csvStrings.added!));
+
+      await Promise.all(
+        Object.entries(csvStrings).map(([category, csv]) => {
+          if (csv) {
+            const csvReader = new zip.TextReader(csv);
+            zipWriter.add(`${category}.csv`, csvReader);
+          }
+        })
+      );
+
+      const zipBlobFile = await zipWriter.close();
+      const thingToSend = new Uint8Array(await zipBlobFile.arrayBuffer());
+
+      // const arrayToWrite = new Uint8Array(await zipBlobFile.arrayBuffer());
+      // Deno.writeFile("debugtxns.zip", arrayToWrite);
+
+      res.set("Content-Disposition", 'attachment; filename="transactions.zip"');
+      res.set("Content-Type", "application/zip");
+      res.set("X-AddedCount", String(txnCount.added));
+      res.set("X-ModifiedCount", String(txnCount.modified));
+      res.set("X-RemovedCount", String(txnCount.removed));
+      // required because of CORS
+      res.set(
+        "Access-Control-Expose-Headers",
+        "X-AddedCount, X-ModifiedCount, X-RemovedCount, Content-Disposition"
+      );
+
+      // have to use end method here instead of send to ensure it's received as binary
+      res.end(thingToSend);
     } catch (err) {
       next(err);
     }
