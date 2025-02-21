@@ -44,15 +44,9 @@ export interface TxnCount {
 export async function downloadWrapper(
   dateQuery: "cursor" | "all"
 ): Promise<TxnCount> {
-  const txnCountRaw = await downloadAndSaveFile({
+  const txnCount = await downloadAndSaveFile({
     url: `${BASE_BACKEND_URL}/api/sync?dateQuery=${dateQuery}`,
     defaultFileName: "transactions.zip",
-  });
-
-  const txnCount = {} as TxnCount;
-  Object.entries(txnCountRaw).forEach(([category, number]) => {
-    const typedCategory = category as keyof TxnCount;
-    txnCount[typedCategory] = number ? Number(number) : 0;
   });
   return txnCount;
 }

@@ -92,10 +92,14 @@ export async function downloadFile(options: Options) {
 
   const type = response.headers.get("content-type")?.split(";")[0];
 
+  const coerceNum = (toCoerce: string | null) => {
+    return toCoerce ? Number(toCoerce) : 0;
+  };
+
   const txnCount = {
-    added: response.headers.get("x-addedcount"),
-    modified: response.headers.get("x-modifiedcount"),
-    removed: response.headers.get("x-removedcount"),
+    added: coerceNum(response.headers.get("x-addedcount")),
+    modified: coerceNum(response.headers.get("x-modifiedcount")),
+    removed: coerceNum(response.headers.get("x-removedcount")),
   };
 
   // It is necessary to create a new blob object with mime-type explicitly set for all browsers except Chrome, but it works for Chrome too.
@@ -123,7 +127,9 @@ export default async function downloadAndSaveFile(
 
   const { fileName, blob, txnCount } = await downloadFile(rest);
 
-  saveBlob(fileName ?? defaultFileName, blob);
+  if (!Object.values(txnCount).every((num) => num === 0)) {
+    saveBlob(fileName ?? defaultFileName, blob);
+  }
 
   return txnCount;
 }
