@@ -25,6 +25,11 @@ export async function deriveKey(
   );
 }
 
+export async function exportKey(key: CryptoKey): Promise<string> {
+  const rawKey = await crypto.subtle.exportKey("raw", key); // Returns ArrayBuffer
+  return btoa(String.fromCharCode(...new Uint8Array(rawKey))); // Convert to Base64
+}
+
 export async function encryptData(plaintext: string, key: CryptoKey) {
   const encoder = new TextEncoder();
   const iv = crypto.getRandomValues(new Uint8Array(12));

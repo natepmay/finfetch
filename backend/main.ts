@@ -26,6 +26,7 @@ import {
 } from "./db.ts";
 import { PlaidLinkOnSuccessMetadata } from "./types.ts";
 import { syncTransactions } from "./plaid/plaidUtils.ts";
+import { importKey } from "./utils/crypto.ts";
 
 const app = express();
 const port = 3002;
@@ -162,16 +163,25 @@ app.get(
 app.post(
   "/api/create_access_token",
   async function (req: Request, res: Response, next: NextFunction) {
-    const { publicToken, metadata } = req.body as {
+    const { publicToken, metadata, cryptoKeyString } = req.body as {
       publicToken: string;
       metadata: PlaidLinkOnSuccessMetadata;
+      cryptoKeyString: string;
     };
+
     try {
       const tokenResponse = await client.itemPublicTokenExchange({
         public_token: publicToken,
       });
       const { access_token, item_id } = tokenResponse.data;
-      addItem({ access_token, item_id, name: metadata.institution?.name });
+
+      const cryptoKey = await importKey(cryptoKeyString);
+
+      await addItem(
+        { access_token, item_id, name: metadata.institution?.name },
+        cryptoKey
+      );
+
       for (const account of metadata.accounts) {
         addAccount({
           account_id: account.id,

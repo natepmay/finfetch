@@ -3,51 +3,28 @@ import { Plus } from "lucide-react";
 import { usePlaidLink, PlaidLinkOnSuccess } from "react-plaid-link";
 import { useCallback, useState, useEffect, useContext } from "react";
 import { RefreshContext } from "../context/RefreshContext";
-
-const BASE_BACKEND_URL = "http://localhost:3002";
+import { createAccessToken, initUser, createLinkToken } from "../api";
 
 export function AddItemButtonArea() {
   const [token, setToken] = useState<string | null>(null);
   const refreshData = useContext(RefreshContext);
 
   useEffect(() => {
-    // TODO move this function to data.ts
-    const createLinkToken = async () => {
-      const response = await fetch(
-        BASE_BACKEND_URL + "/api/create_link_token",
-        {
-          method: "POST",
-        }
-      );
-      const { link_token } = await response.json();
-      setToken(link_token);
+    const tokenWrapper = async () => {
+      const linkToken = await createLinkToken();
+      setToken(linkToken);
     };
-    createLinkToken();
+    tokenWrapper();
   }, []);
 
   const onSuccess = useCallback<PlaidLinkOnSuccess>(
     async (publicToken, metadata) => {
-      try {
-        const response = await fetch(
-          BASE_BACKEND_URL + "/api/create_access_token",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              publicToken: publicToken,
-              metadata: metadata,
-            }),
-          }
-        );
-        const data = (await response.json()) as { itemId: string };
-        console.log(publicToken, metadata);
-        console.log("itemId returned from API: ", data.itemId);
-        refreshData();
-      } catch (error) {
-        console.error(error);
-      }
+      // FOR TESTING ONLY
+      const cryptoKey = await initUser("amazing password");
+
+      const itemId = await createAccessToken(publicToken, metadata, cryptoKey);
+      console.log("itemId returned from API: ", itemId);
+      refreshData();
     },
     [refreshData]
   );

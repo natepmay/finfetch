@@ -3,6 +3,7 @@ import * as path from "jsr:@std/path";
 
 import { Account, Item, ServerItem } from "../sharedTypes.ts";
 import { camelToSnake } from "./utils/pureFns.ts";
+import { encryptData } from "./utils/crypto.ts";
 
 const dbPath = path.resolve(import.meta.dirname || "", "db.db");
 const db = new DB(dbPath);
@@ -19,9 +20,10 @@ export function initDb() {
     db.execute(`
       CREATE TABLE items (
         item_id TEXT PRIMARY KEY,
-        access_token TEXT,
+        access_token BLOB,
         cursor TEXT,
-        name TEXT
+        name TEXT,
+        iv BLOB
       );
     `);
     console.log("success!");
@@ -68,17 +70,23 @@ export function initDb() {
  * Add an item to the database.
  * @param db databse instance.
  * @param item
+ * @param cryptoKey
  */
-export function addItem(item: {
-  item_id: string;
-  access_token: string;
-  name?: string;
-}) {
-  db.query("INSERT INTO items (item_id, access_token, name) VALUES(?, ?, ?)", [
-    item.item_id,
-    item.access_token,
-    item.name ?? null,
-  ]);
+export async function addItem(
+  item: {
+    item_id: string;
+    access_token: string;
+    name?: string;
+  },
+  cryptoKey: CryptoKey
+) {
+  const { iv, encrypted } = await encryptData(item.access_token, cryptoKey);
+  const encryptedAccessToken = new Uint8Array(encrypted);
+
+  db.query(
+    "INSERT INTO items (item_id, access_token, name, iv) VALUES(?, ?, ?, ?)",
+    [item.item_id, encryptedAccessToken, item.name ?? null, iv]
+  );
 }
 /**
  * Add an account to the database.

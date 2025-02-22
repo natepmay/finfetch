@@ -1,6 +1,7 @@
 import downloadAndSaveFile from "./utils/download.ts";
 import { Item, Account } from "../../sharedTypes.ts";
-import { deriveKey } from "./utils/crypto.ts";
+import { deriveKey, exportKey } from "./utils/crypto.ts";
+import { PlaidLinkOnSuccessMetadata } from "react-plaid-link";
 
 const BASE_BACKEND_URL = "http://localhost:3002";
 
@@ -103,4 +104,32 @@ export async function initUser(password: string) {
   return cryptoKey;
 }
 
-await initUser("balbalbala");
+export async function createAccessToken(
+  publicToken: string,
+  metadata: PlaidLinkOnSuccessMetadata,
+  cryptoKey: CryptoKey
+) {
+  const cryptoKeyString = await exportKey(cryptoKey);
+
+  const response = await fetch(BASE_BACKEND_URL + "/api/create_access_token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      publicToken: publicToken,
+      metadata: metadata,
+      cryptoKeyString: cryptoKeyString,
+    }),
+  });
+  const data = (await response.json()) as { itemId: string };
+  return data.itemId;
+}
+
+export async function createLinkToken() {
+  const response = await fetch(BASE_BACKEND_URL + "/api/create_link_token", {
+    method: "POST",
+  });
+  const { link_token } = (await response.json()) as { link_token: string };
+  return link_token;
+}
