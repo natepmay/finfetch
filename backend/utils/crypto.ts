@@ -23,7 +23,6 @@ export async function decryptData(
 }
 
 export async function importKey(base64Key: string): Promise<CryptoKey> {
-  console.log("base64key: ", base64Key);
   const rawKey = Uint8Array.from(atob(base64Key), (c) => c.charCodeAt(0));
   return await crypto.subtle.importKey(
     "raw",

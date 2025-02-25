@@ -65,7 +65,11 @@ const client = new PlaidApi(configuration);
 app.get(
   "/api/sync",
   async (req: Request, res: Response, next: NextFunction) => {
-    const items = getItems();
+    const cryptoKeyString = req.get("X-Crypto-Key-String");
+    const cryptoKey = await importKey(cryptoKeyString);
+
+    const items = await getItems(cryptoKey);
+
     const { dateQuery }: { dateQuery: "cursor" | "all" } = req.query;
 
     try {
@@ -141,8 +145,11 @@ app.post(
 );
 
 // probably should just be "/api/items"
-app.get("/api/getItems", function (_: Request, res: Response) {
-  const items = getItems();
+app.get("/api/getItems", async function (req: Request, res: Response) {
+  const cryptoKeyString = req.get("X-Crypto-Key-String");
+  const cryptoKey = await importKey(cryptoKeyString);
+
+  const items = await getItems(cryptoKey);
   const itemsFrontend = items.map((item) => ({
     itemId: item.itemId,
     name: item.name,

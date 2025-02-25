@@ -47,13 +47,14 @@ interface Options {
     | ((fetchOptions: RequestInit) => Promise<RequestInit>);
 }
 
-export async function downloadFile(options: Options) {
+export async function downloadFile(options: Options, cryptoKeyString: string) {
   const { url, onDownloadProgress, fetchOptions, body } = options;
 
   let requestInit: RequestInit = {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
+      "X-Crypto-Key-String": cryptoKeyString,
     },
     body,
   };
@@ -121,11 +122,15 @@ interface DownloadAndSaveFileOptions extends Options {
 }
 
 export default async function downloadAndSaveFile(
-  options: DownloadAndSaveFileOptions
+  options: DownloadAndSaveFileOptions,
+  cryptoKeyString: string
 ) {
   const { defaultFileName, ...rest } = options;
 
-  const { fileName, blob, txnCount } = await downloadFile(rest);
+  const { fileName, blob, txnCount } = await downloadFile(
+    rest,
+    cryptoKeyString
+  );
 
   if (!Object.values(txnCount).every((num) => num === 0)) {
     saveBlob(fileName ?? defaultFileName, blob);

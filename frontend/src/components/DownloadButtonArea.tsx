@@ -5,11 +5,13 @@ import { Button } from "./shared/Button";
 import { Modal } from "./shared/Modal";
 import { downloadWrapper, TxnCount } from "../api";
 import { RefreshContext } from "../context/RefreshContext";
+import { CryptoKeyContext } from "../context/CryptoKeyContext";
 
 type ModalState = "hidden" | "error" | "success";
 
 export function DownloadButtonArea({ disabled }: { disabled: boolean }) {
   const refreshData = useContext(RefreshContext);
+  const cryptoKey = useContext(CryptoKeyContext);
   const [modalState, setModalState] = useState("hidden" as ModalState);
   const [errorMessage, setErrorMessage] = useState(null as string | null);
   const [dateQuery, setDateQuery] = useState("cursor" as "cursor" | "all");
@@ -21,7 +23,7 @@ export function DownloadButtonArea({ disabled }: { disabled: boolean }) {
 
   async function handleOnClick() {
     try {
-      const txnsRaw = await downloadWrapper(dateQuery);
+      const txnsRaw = await downloadWrapper(dateQuery, cryptoKey!);
       setTxnCount(txnsRaw);
       refreshData();
       setModalState("success");

@@ -9,11 +9,22 @@ const BASE_BACKEND_URL = "http://localhost:3002";
  * Get all items from database.
  * @returns
  */
-export async function getItems(): Promise<Item[]> {
-  const res = await fetch(BASE_BACKEND_URL + "/api/getItems");
+export async function getItems(cryptoKey: CryptoKey): Promise<Item[]> {
+  const cryptoKeyString = await exportKey(cryptoKey);
+
+  console.log("crypto key string client: ", cryptoKeyString);
+
+  const res = await fetch(BASE_BACKEND_URL + "/api/getItems", {
+    headers: {
+      "X-Crypto-Key-String": cryptoKeyString,
+      "Access-Control-Expose-Headers": "X-Crypto-Key-String",
+    },
+  });
+
   if (!res.ok) {
     throw new Error("Failed to fetch items.");
   }
+
   const data: Item[] = await res.json();
   return data;
 }
@@ -44,12 +55,18 @@ export interface TxnCount {
  * Call the sync endpoint and downloads the file.
  */
 export async function downloadWrapper(
-  dateQuery: "cursor" | "all"
+  dateQuery: "cursor" | "all",
+  cryptoKey: CryptoKey
 ): Promise<TxnCount> {
-  const txnCount = await downloadAndSaveFile({
-    url: `${BASE_BACKEND_URL}/api/sync?dateQuery=${dateQuery}`,
-    defaultFileName: "transactions.zip",
-  });
+  const cryptoKeyString = await exportKey(cryptoKey);
+
+  const txnCount = await downloadAndSaveFile(
+    {
+      url: `${BASE_BACKEND_URL}/api/sync?dateQuery=${dateQuery}`,
+      defaultFileName: "transactions.zip",
+    },
+    cryptoKeyString
+  );
   return txnCount;
 }
 

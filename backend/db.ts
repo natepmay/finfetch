@@ -1,9 +1,10 @@
 import { DB } from "https://deno.land/x/sqlite/mod.ts";
 import * as path from "jsr:@std/path";
+import { Buffer } from "jsr:@std/io/buffer";
 
 import { Account, Item, ServerItem } from "../sharedTypes.ts";
 import { camelToSnake } from "./utils/pureFns.ts";
-import { encryptData } from "./utils/crypto.ts";
+import { encryptData, decryptData } from "./utils/crypto.ts";
 
 const dbPath = path.resolve(import.meta.dirname || "", "db.db");
 const db = new DB(dbPath);
@@ -112,12 +113,21 @@ export function addAccount(account: {
  * @param db database instance
  * @returns array of items. Remove access token before sending to client.
  */
-export function getItems(): ServerItem[] {
+export async function getItems(cryptoKey: CryptoKey): Promise<ServerItem[]> {
   const results = [];
 
-  for (const [name, itemId, accessToken, cursor] of db.query(
-    "SELECT name, item_id as itemId, access_token as accessToken, cursor FROM items"
-  ) as Iterable<[string, string, string, string]>) {
+  function uint8ArrayToArrayBuffer(uint8Array: Uint8Array): ArrayBuffer {
+    return uint8Array.buffer.slice(
+      uint8Array.byteOffset,
+      uint8Array.byteOffset + uint8Array.byteLength
+    );
+  }
+
+  for (const [name, itemId, accessTokenEncrypted, iv, cursor] of db.query(
+    "SELECT name, item_id as itemId, access_token as accessTokenEncrypted, iv, cursor FROM items"
+  ) as Iterable<[string, string, Uint8Array, Uint8Array, string]>) {
+    const accessTokenBuffer = uint8ArrayToArrayBuffer(accessTokenEncrypted);
+    const accessToken = await decryptData(accessTokenBuffer, iv, cryptoKey);
     results.push({ name, itemId, accessToken, cursor });
   }
 
@@ -179,8 +189,10 @@ export function updateAccount(accountId: string, resourceIn: Account) {
 
 export function updateItem(itemId: string, resourceIn: ServerItem) {
   if (itemId !== resourceIn.itemId) throw new Error("Item ids don't match.");
-  const resource: Partial<Item> = { ...resourceIn };
+  const resource: Partial<ServerItem> = { ...resourceIn };
   delete resource.itemId;
+  // don't want to touch the accessToken because it won't change and we'd need the cryptoKey
+  delete resource.accessToken;
 
   const fields = Object.keys(resource).map((field) => camelToSnake(field));
   const values = Object.values(resource);

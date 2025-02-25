@@ -3,11 +3,13 @@ import { Plus } from "lucide-react";
 import { usePlaidLink, PlaidLinkOnSuccess } from "react-plaid-link";
 import { useCallback, useState, useEffect, useContext } from "react";
 import { RefreshContext } from "../context/RefreshContext";
-import { createAccessToken, initUser, createLinkToken } from "../api";
+import { createAccessToken, createLinkToken } from "../api";
+import { CryptoKeyContext } from "../context/CryptoKeyContext";
 
 export function AddItemButtonArea() {
   const [token, setToken] = useState<string | null>(null);
   const refreshData = useContext(RefreshContext);
+  const cryptoKey = useContext(CryptoKeyContext);
 
   useEffect(() => {
     const tokenWrapper = async () => {
@@ -19,14 +21,11 @@ export function AddItemButtonArea() {
 
   const onSuccess = useCallback<PlaidLinkOnSuccess>(
     async (publicToken, metadata) => {
-      // FOR TESTING ONLY
-      const cryptoKey = await initUser("amazing password");
-
-      const itemId = await createAccessToken(publicToken, metadata, cryptoKey);
+      const itemId = await createAccessToken(publicToken, metadata, cryptoKey!);
       console.log("itemId returned from API: ", itemId);
       refreshData();
     },
-    [refreshData]
+    [refreshData, cryptoKey]
   );
 
   const { open, ready } = usePlaidLink({
