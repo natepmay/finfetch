@@ -1,8 +1,7 @@
 import { DB } from "https://deno.land/x/sqlite/mod.ts";
 import * as path from "jsr:@std/path";
-import { Buffer } from "jsr:@std/io/buffer";
 
-import { Account, Item, ServerItem } from "../sharedTypes.ts";
+import { Account, ServerItem } from "../sharedTypes.ts";
 import { camelToSnake } from "./utils/pureFns.ts";
 import { encryptData, decryptData } from "./utils/crypto.ts";
 
@@ -208,7 +207,6 @@ export function updateItem(itemId: string, resourceIn: ServerItem) {
 
 /**
  * Remove an item from the database.
- * @param db database instance.
  * @param itemId itemId of item to delete.
  * @returns
  */
@@ -222,7 +220,6 @@ export function deleteItem(itemId: string) {
 
 /**
  * Lookup full info about an account.
- * @param db
  * @param accountId
  * @returns
  */
@@ -249,4 +246,11 @@ export function getAccountById(accountId: string): Account {
 
 export function addSalt(salt: Uint8Array) {
   db.query("REPLACE INTO users (user_id, salt) VALUES(1, ?)", [salt]);
+}
+
+export function getSalt(userId: number) {
+  const [[salt]] = db.query("SELECT salt from users WHERE user_id = ?", [
+    userId,
+  ]) as Iterable<[Uint8Array]>;
+  return salt;
 }

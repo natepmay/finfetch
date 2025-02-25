@@ -23,6 +23,7 @@ import {
   deleteItem,
   updateAccount,
   addSalt,
+  getSalt,
 } from "./db.ts";
 import { PlaidLinkOnSuccessMetadata } from "./types.ts";
 import { syncTransactions } from "./plaid/plaidUtils.ts";
@@ -255,6 +256,18 @@ app.post(
     try {
       const salt = crypto.getRandomValues(new Uint8Array(16));
       addSalt(salt);
+      res.end(salt);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+app.get(
+  "/api/users/1/salt",
+  function (_: Request, res: Response, next: NextFunction) {
+    try {
+      const salt = getSalt(1);
       res.end(salt);
     } catch (error) {
       next(error);
