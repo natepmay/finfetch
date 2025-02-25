@@ -94,10 +94,16 @@ export async function updateAccount(resource: Account) {
  * Delete an item from database and remove the item on the Plaid side.
  * @param itemId itemId of item to delete
  */
-export async function deleteItem(itemId: string) {
+export async function deleteItem(itemId: string, cryptoKey: CryptoKey) {
+  const cryptoKeyString = await exportKey(cryptoKey);
+
   try {
     await fetch(`${BASE_BACKEND_URL}/api/items/${itemId}`, {
       method: "DELETE",
+      headers: {
+        "X-Crypto-Key-String": cryptoKeyString,
+        "Access-Control-Expose-Headers": "X-Crypto-Key-String",
+      },
     });
   } catch (error) {
     throw new Error(String(error));

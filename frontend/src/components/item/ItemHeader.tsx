@@ -5,15 +5,18 @@ import { Button } from "../shared/Button";
 import { deleteItem } from "../../api";
 import { Item } from "../../../../sharedTypes";
 import { RefreshContext } from "../../context/RefreshContext";
+import { CryptoKeyContext } from "../../context/CryptoKeyContext";
 
 export function ItemHeader({ item }: { item: Item }) {
+  const cryptoKey = useContext(CryptoKeyContext);
+
   type ModalState = "closed" | "removeConfirm";
 
   const [modalState, setModalState] = useState("closed" as ModalState);
   const refreshData = useContext(RefreshContext);
 
   async function handleConfirm() {
-    await deleteItem(item.itemId);
+    await deleteItem(item.itemId, cryptoKey!);
     refreshData();
     setModalState("closed");
   }

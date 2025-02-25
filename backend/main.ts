@@ -227,13 +227,21 @@ app.delete(
   "/api/items/:itemId",
   async function (req: Request, res: Response, next: NextFunction) {
     try {
+      const cryptoKeyString = req.get("X-Crypto-Key-String");
+      const cryptoKey = await importKey(cryptoKeyString);
+
       const { itemId } = req.params;
-      const item = getItems().find((item) => item.itemId === itemId);
+
+      const items = await getItems(cryptoKey);
+      const item = items.find((item) => item.itemId === itemId);
       if (!item) throw new Error("Requested item does not exist");
+
       await client.itemRemove({
         access_token: item.accessToken,
       });
+
       deleteItem(itemId);
+
       res.status(204).send("Deleted");
     } catch (error) {
       next(error);
