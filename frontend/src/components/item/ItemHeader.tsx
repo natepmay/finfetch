@@ -1,9 +1,12 @@
 import { useState, useContext } from "react";
 import { Trash2 } from "lucide-react";
+
 import { Modal } from "../shared/Modal";
 import { Button } from "../shared/Button";
+
 import { deleteItem } from "../../api";
 import { Item } from "../../../../sharedTypes";
+
 import { RefreshContext } from "../../context/RefreshContext";
 import { CryptoKeyContext } from "../../context/CryptoKeyContext";
 
