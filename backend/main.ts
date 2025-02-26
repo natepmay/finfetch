@@ -2,7 +2,6 @@ import express from "npm:express";
 import type { Request, Response, NextFunction } from "npm:express";
 // Express types are being weird in Deno
 // import { Request, Response, NextFunction } from "npm:@types/express";
-import cors from "npm:cors";
 import bodyParser from "npm:body-parser";
 import {
   Configuration,
@@ -13,6 +12,8 @@ import {
 } from "npm:plaid";
 import "jsr:@std/dotenv/load";
 import * as zip from "jsr:@zip-js/zip-js";
+import { dirname, join } from "jsr:@std/path";
+import { fromFileUrl } from "jsr:@std/path/from-file-url";
 
 import {
   initDb,
@@ -33,10 +34,11 @@ import { importKey } from "./utils/crypto.ts";
 const app = express();
 const port = 3002;
 
+const __filename = fromFileUrl(import.meta.url);
+const __dirname = dirname(__filename);
+const frontendDistPath = join(__dirname, "../frontend/dist");
+
 app.use(bodyParser.json());
-// CORS is needed to talk to the frontend. Access is restricted to requests
-// from the same machine by explicitly setting the localhost IP in app.listen() below.
-app.use(cors());
 
 initDb();
 // TODO don't forget to close the db later
@@ -63,6 +65,12 @@ const configuration = new Configuration({
 });
 
 const client = new PlaidApi(configuration);
+
+app.use("/", express.static(frontendDistPath));
+
+app.get("/", (_: Request, res: Response) => {
+  res.sendFile(join(frontendDistPath, "index.html"));
+});
 
 app.get(
   "/api/sync",
