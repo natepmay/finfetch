@@ -275,6 +275,20 @@ app.get(
   }
 );
 
+// app.get(
+//   "/api/users/1/auth",
+//   async function (req: Request, res: Response, next: NextFunction) {
+//     try {
+//       const cryptoKeyString = req.get("X-Crypto-Key-String");
+//       const cryptoKey = await importKey(cryptoKeyString);
+
+//       const items =
+//       // TODO fill in
+
+//     }
+//   }
+// )
+
 // ------ BEGIN ENDPOINTS FOR TESTING
 // for testing: get a user token so you can call client.userItemsGet
 app.post("/api/user/1/create", async function (_: Request, res: Response) {

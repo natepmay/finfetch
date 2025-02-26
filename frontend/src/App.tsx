@@ -3,12 +3,14 @@ import { DownloadButtonArea } from "./components/DownloadButtonArea";
 import { Header } from "./components/Header";
 import { ItemCardArea } from "./components/item/ItemCardArea";
 import { NoItemsMessage } from "./components/NoItemsMessage";
-import { getAccounts, getItems, initUser } from "./api";
+import { Button } from "./components/shared/Button";
+import { getAccounts, getItems, initUser, authenticate } from "./api";
 
 import { useEffect, useState } from "react";
 import { RefreshContext } from "./context/RefreshContext";
 import { DataContext, ItemWithAccounts } from "./context/DataContext";
 import { CryptoKeyContext } from "./context/CryptoKeyContext";
+import { LoggedOut } from "./components/logged-out/LoggedOut";
 
 function App() {
   const [appData, setAppData] = useState([] as ItemWithAccounts[]);
@@ -43,22 +45,33 @@ function App() {
     setRefreshTrigger((value) => value + 1);
   }
 
+  async function testAuth() {
+    const success = await authenticate("totally rad password");
+    console.log(success);
+  }
+
   return (
     <div className="bg-gray-100 pb-5 min-h-screen">
       <DataContext.Provider value={appData}>
         <RefreshContext.Provider value={refreshData}>
           <CryptoKeyContext.Provider value={cryptoKey}>
             <Header></Header>
-            <DownloadButtonArea
-              disabled={appData.length === 0}
-            ></DownloadButtonArea>
-            {appData.length > 0 ? (
-              <ItemCardArea></ItemCardArea>
-            ) : (
-              <NoItemsMessage></NoItemsMessage>
-            )}
+            {!cryptoKey && <LoggedOut></LoggedOut>}
+            {cryptoKey && (
+              <>
+                <Button onClick={testAuth}>Test Auth</Button>
+                <DownloadButtonArea
+                  disabled={appData.length === 0}
+                ></DownloadButtonArea>
+                {appData.length > 0 ? (
+                  <ItemCardArea></ItemCardArea>
+                ) : (
+                  <NoItemsMessage></NoItemsMessage>
+                )}
 
-            <AddItemButtonArea></AddItemButtonArea>
+                <AddItemButtonArea></AddItemButtonArea>
+              </>
+            )}
           </CryptoKeyContext.Provider>
         </RefreshContext.Provider>
       </DataContext.Provider>

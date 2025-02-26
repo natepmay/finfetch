@@ -156,3 +156,21 @@ export async function createLinkToken() {
   const { link_token } = (await response.json()) as { link_token: string };
   return link_token;
 }
+
+export async function authenticate(password: string) {
+  const saltRaw = await fetch(BASE_BACKEND_URL + "/api/users/1/salt", {
+    method: "GET",
+  });
+  const saltBuffer = await saltRaw.arrayBuffer();
+  const salt = new Uint8Array(saltBuffer);
+
+  const cryptoKey = await deriveKey(password, salt);
+
+  try {
+    const items = await getItems(cryptoKey);
+    console.log("items length:  ", items.length);
+    return true;
+  } catch {
+    return false;
+  }
+}
