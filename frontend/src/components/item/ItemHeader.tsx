@@ -8,7 +8,7 @@ import { RefreshContext } from "../../context/RefreshContext";
 import { CryptoKeyContext } from "../../context/CryptoKeyContext";
 
 export function ItemHeader({ item }: { item: Item }) {
-  const cryptoKey = useContext(CryptoKeyContext);
+  const { cryptoKey } = useContext(CryptoKeyContext);
 
   type ModalState = "closed" | "removeConfirm";
 

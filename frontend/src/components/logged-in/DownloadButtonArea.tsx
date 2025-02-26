@@ -1,17 +1,17 @@
 import { ChangeEvent, useContext, useState } from "react";
 import { ArrowDownToLine } from "lucide-react";
 
-import { Button } from "./shared/Button";
-import { Modal } from "./shared/Modal";
-import { downloadWrapper, TxnCount } from "../api";
-import { RefreshContext } from "../context/RefreshContext";
-import { CryptoKeyContext } from "../context/CryptoKeyContext";
+import { Button } from "../shared/Button";
+import { Modal } from "../shared/Modal";
+import { downloadWrapper, TxnCount } from "../../api";
+import { RefreshContext } from "../../context/RefreshContext";
+import { CryptoKeyContext } from "../../context/CryptoKeyContext";
 
 type ModalState = "hidden" | "error" | "success";
 
 export function DownloadButtonArea({ disabled }: { disabled: boolean }) {
   const refreshData = useContext(RefreshContext);
-  const cryptoKey = useContext(CryptoKeyContext);
+  const { cryptoKey } = useContext(CryptoKeyContext);
   const [modalState, setModalState] = useState("hidden" as ModalState);
   const [errorMessage, setErrorMessage] = useState(null as string | null);
   const [dateQuery, setDateQuery] = useState("cursor" as "cursor" | "all");

@@ -1,10 +1,15 @@
+import { useContext, useState } from "react";
+
 import { initUser } from "../../api";
 import { Button } from "../shared/Button";
 import { Modal } from "../shared/Modal";
-import { useState } from "react";
+
+import { CryptoKeyContext } from "../../context/CryptoKeyContext";
 
 export function StartFromScratch() {
   const [modalState, setModalState] = useState("hidden" as "hidden" | "init");
+
+  const { setCryptoKey } = useContext(CryptoKeyContext);
 
   const handleNicknameSubmit = async (
     event: React.FormEvent<HTMLFormElement>
@@ -13,7 +18,8 @@ export function StartFromScratch() {
     const formData = new FormData(event.currentTarget);
     const password = formData.get("newPassword") as string;
 
-    const cryptoKey = await initUser(password);
+    const nextCryptoKey = await initUser(password);
+    setCryptoKey(nextCryptoKey);
   };
   return (
     <>

@@ -1,15 +1,15 @@
-import { Button } from "./shared/Button";
+import { Button } from "../shared/Button";
 import { Plus } from "lucide-react";
 import { usePlaidLink, PlaidLinkOnSuccess } from "react-plaid-link";
 import { useCallback, useState, useEffect, useContext } from "react";
-import { RefreshContext } from "../context/RefreshContext";
-import { createAccessToken, createLinkToken } from "../api";
-import { CryptoKeyContext } from "../context/CryptoKeyContext";
+import { RefreshContext } from "../../context/RefreshContext";
+import { createAccessToken, createLinkToken } from "../../api";
+import { CryptoKeyContext } from "../../context/CryptoKeyContext";
 
 export function AddItemButtonArea() {
   const [token, setToken] = useState<string | null>(null);
   const refreshData = useContext(RefreshContext);
-  const cryptoKey = useContext(CryptoKeyContext);
+  const { cryptoKey } = useContext(CryptoKeyContext);
 
   useEffect(() => {
     const tokenWrapper = async () => {
