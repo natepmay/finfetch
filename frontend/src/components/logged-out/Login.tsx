@@ -72,9 +72,7 @@ export function Login() {
 
   const userDoesntExist = (
     <>
-      <h3 className="text-gray-500">
-        No data found. Click "Start from Scratch" to get started.
-      </h3>
+      <h3>No data found. Click "Start from Scratch" to get started.</h3>
     </>
   );
 
