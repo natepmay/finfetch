@@ -56,6 +56,7 @@ export function ItemCardAccount({
           </div>
         </div>
       </div>
+
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <form className="flex flex-col" onSubmit={handleNicknameSubmit}>
           <h2 className="font-bold text-lg mb-4">Account Nickname</h2>
