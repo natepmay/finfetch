@@ -14,6 +14,7 @@ export function Login() {
   const [userStatus, setUserStatus] = useState(
     "loading" as "loading" | "existent" | "nonexistent"
   );
+  const [retries, setRetries] = useState(10);
 
   const { setCryptoKey } = useContext(CryptoKeyContext);
 
@@ -27,6 +28,7 @@ export function Login() {
     if (result) {
       setCryptoKey(result);
     } else {
+      setRetries((previous) => previous - 1);
       setModalState("wrongPw");
     }
   };
@@ -82,8 +84,7 @@ export function Login() {
       >
         <h2 className="font-bold text-lg mb-4">Incorrect Password</h2>
         <h3 className="mb-4">
-          Try again or start from scratch. After ten retries your data will
-          reset.
+          Try again or start from scratch. Tries remaining: {retries}.
         </h3>
         <Button onClick={() => setModalState("hidden")}>Okay</Button>
       </Modal>

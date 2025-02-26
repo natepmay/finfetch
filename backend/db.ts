@@ -254,3 +254,9 @@ export function getSalt(userId: number) {
   ]) as Iterable<[Uint8Array]>;
   return salt;
 }
+
+export function wipeData() {
+  db.query("DELETE from accounts");
+  db.query("DELETE from items");
+  db.query("DELETE from users");
+}

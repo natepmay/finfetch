@@ -119,11 +119,6 @@ export async function initUser(password: string) {
 
   const cryptoKey = await deriveKey(password, salt);
 
-  // To test:
-  // const { iv, encrypted } = await encryptData("hey hey hey", cryptoKey);
-  // const decrypted = await decryptData(encrypted, iv, cryptoKey);
-  // console.log(decrypted);
-
   return cryptoKey;
 }
 
@@ -181,5 +176,16 @@ export async function authenticate(password: string) {
     return cryptoKey;
   } catch {
     return null;
+  }
+}
+
+export async function wipeData() {
+  try {
+    const res = await fetch(`${BASE_BACKEND_URL}/api/users/1`, {
+      method: "DELETE",
+    });
+    if (!res.ok) throw new Error("Unable to delete");
+  } catch (err) {
+    throw new Error(String(err));
   }
 }

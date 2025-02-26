@@ -24,6 +24,7 @@ import {
   updateAccount,
   addSalt,
   getSalt,
+  wipeData,
 } from "./db.ts";
 import { PlaidLinkOnSuccessMetadata } from "./types.ts";
 import { syncTransactions } from "./plaid/plaidUtils.ts";
@@ -262,6 +263,7 @@ app.post(
   "/api/users/create",
   function (_: Request, res: Response, next: NextFunction) {
     try {
+      wipeData();
       const salt = crypto.getRandomValues(new Uint8Array(16));
       addSalt(salt);
       res.end(salt);
@@ -277,6 +279,18 @@ app.get(
     try {
       const salt = getSalt(1);
       res.end(salt);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+app.delete(
+  "/api/users/1",
+  function (_: Request, res: Response, next: NextFunction) {
+    try {
+      wipeData();
+      res.status(200).send();
     } catch (error) {
       next(error);
     }
