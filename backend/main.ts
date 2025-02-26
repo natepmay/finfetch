@@ -146,17 +146,25 @@ app.post(
 );
 
 // probably should just be "/api/items"
-app.get("/api/getItems", async function (req: Request, res: Response) {
-  const cryptoKeyString = req.get("X-Crypto-Key-String");
-  const cryptoKey = await importKey(cryptoKeyString);
+app.get(
+  "/api/getItems",
+  async function (req: Request, res: Response, next: NextFunction) {
+    try {
+      const cryptoKeyString = req.get("X-Crypto-Key-String");
+      const cryptoKey = await importKey(cryptoKeyString);
 
-  const items = await getItems(cryptoKey);
-  const itemsFrontend = items.map((item) => ({
-    itemId: item.itemId,
-    name: item.name,
-  }));
-  res.json(itemsFrontend);
-});
+      const items = await getItems(cryptoKey);
+      const itemsFrontend = items.map((item) => ({
+        itemId: item.itemId,
+        name: item.name,
+      }));
+      res.json(itemsFrontend);
+    } catch (error) {
+      res.status(400).send();
+      next(error);
+    }
+  }
+);
 
 app.get(
   // maybe this should be "/api/items/:itemId/accounts"

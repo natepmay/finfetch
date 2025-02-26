@@ -1,14 +1,18 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 
 import { Button } from "../shared/Button";
 import { Modal } from "../shared/Modal";
 
 import { authenticate } from "../../api";
 
+import { CryptoKeyContext } from "../../context/CryptoKeyContext";
+
 export function Login() {
   const [modalState, setModalState] = useState(
     "hidden" as "hidden" | "wrongPw"
   );
+
+  const { setCryptoKey } = useContext(CryptoKeyContext);
 
   const handleEnterPw = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -16,7 +20,12 @@ export function Login() {
     const password = formData.get("password") as string;
 
     const result = await authenticate(password);
-    console.log("Result: ", result);
+
+    if (result) {
+      setCryptoKey(result);
+    } else {
+      setModalState("wrongPw");
+    }
   };
 
   return (
@@ -39,7 +48,7 @@ export function Login() {
         onClose={() => setModalState("hidden")}
       >
         <h2 className="font-bold text-lg mb-4">Incorrect Password</h2>
-        <h3 className="mb-2">
+        <h3 className="mb-4">
           Try again or start from scratch. After ten retries your data will
           reset.
         </h3>

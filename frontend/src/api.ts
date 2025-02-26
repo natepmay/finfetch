@@ -167,10 +167,9 @@ export async function authenticate(password: string) {
   const cryptoKey = await deriveKey(password, salt);
 
   try {
-    const items = await getItems(cryptoKey);
-    console.log("items length:  ", items.length);
-    return true;
+    await getItems(cryptoKey);
+    return cryptoKey;
   } catch {
-    return false;
+    return null;
   }
 }
