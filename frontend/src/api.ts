@@ -157,12 +157,22 @@ export async function createLinkToken() {
   return link_token;
 }
 
+export async function getSalt() {
+  try {
+    const saltRaw = await fetch(BASE_BACKEND_URL + "/api/users/1/salt", {
+      method: "GET",
+    });
+    if (!saltRaw.ok) throw new Error("no salt");
+    const saltBuffer = await saltRaw.arrayBuffer();
+    const salt = new Uint8Array(saltBuffer);
+    return salt;
+  } catch (err) {
+    throw new Error(String(err));
+  }
+}
+
 export async function authenticate(password: string) {
-  const saltRaw = await fetch(BASE_BACKEND_URL + "/api/users/1/salt", {
-    method: "GET",
-  });
-  const saltBuffer = await saltRaw.arrayBuffer();
-  const salt = new Uint8Array(saltBuffer);
+  const salt = await getSalt();
 
   const cryptoKey = await deriveKey(password, salt);
 
