@@ -1,7 +1,5 @@
 import express from "npm:express";
 import type { Request, Response, NextFunction } from "npm:express";
-// Express types are being weird in Deno
-// import { Request, Response, NextFunction } from "npm:@types/express";
 import cors from "npm:cors";
 import bodyParser from "npm:body-parser";
 import {
@@ -112,9 +110,6 @@ app.get(
 
       const zipBlobFile = await zipWriter.close();
       const thingToSend = new Uint8Array(await zipBlobFile.arrayBuffer());
-
-      // const arrayToWrite = new Uint8Array(await zipBlobFile.arrayBuffer());
-      // Deno.writeFile("debugtxns.zip", arrayToWrite);
 
       res.set("Content-Disposition", 'attachment; filename="transactions.zip"');
       res.set("Content-Type", "application/zip");
@@ -308,53 +303,7 @@ app.delete(
   }
 );
 
-// app.get(
-//   "/api/users/1/auth",
-//   async function (req: Request, res: Response, next: NextFunction) {
-//     try {
-//       const cryptoKeyString = req.get("X-Crypto-Key-String");
-//       const cryptoKey = await importKey(cryptoKeyString);
-
-//       const items =
-//       // TODO fill in
-
-//     }
-//   }
-// )
-
 // ------ BEGIN ENDPOINTS FOR TESTING
-// for testing: get a user token so you can call client.userItemsGet
-app.post("/api/user/1/create", async function (_: Request, res: Response) {
-  try {
-    const resp = await client.userCreate({ client_user_id: "1" });
-    console.log(resp);
-    res.json(resp.data);
-  } catch (error) {
-    console.log(error);
-    res.status(400).send("error");
-  }
-});
-
-app.get(
-  "/api/item/:accessToken",
-  async function (req: Request, res: Response, _: NextFunction) {
-    const { accessToken } = req.params;
-    const resp = await client.itemGet({ access_token: accessToken });
-    console.log(resp.data);
-    res.json(resp.data);
-  }
-);
-
-// for testing: add your user token here when it's returned from client.userCreate
-const USER_TOKEN = "";
-app.get("/api/user/1/items", async function (_: Request, res: Response) {
-  const { data } = await client.userItemsGet({
-    user_token: USER_TOKEN,
-  });
-  console.log(data);
-  res.json(data);
-});
-
 // reset an item to logged out state
 app.post(
   "/api/sandbox/item/:accessToken/reset_login",

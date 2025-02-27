@@ -10,8 +10,7 @@ const db = new DB(dbPath);
 
 /**
  * Create the SQLite tables.
- * @param db SQLite database instance.
- * @returns Nothing.
+ * @returns
  */
 export function initDb() {
   let itemsAlreadyCreated = false;
@@ -68,7 +67,6 @@ export function initDb() {
 
 /**
  * Add an item to the database.
- * @param db databse instance.
  * @param item
  * @param cryptoKey
  */
@@ -90,7 +88,6 @@ export async function addItem(
 }
 /**
  * Add an account to the database.
- * @param db database instance.
  * @param account
  */
 export function addAccount(account: {
@@ -109,7 +106,6 @@ export function addAccount(account: {
 
 /**
  * Get all items from database.
- * @param db database instance
  * @returns array of items. Remove access token before sending to client.
  */
 export async function getItems(cryptoKey: CryptoKey): Promise<ServerItem[]> {
@@ -135,9 +131,8 @@ export async function getItems(cryptoKey: CryptoKey): Promise<ServerItem[]> {
 
 /**
  * Get accounts from the database.
- * @param db database instance.
  * @param requestedItemId If blank, get all accounts.
- * @returns List of accounts.
+ * @returns
  */
 export function getAccounts(requestedItemId?: string): Account[] {
   const results = [];
@@ -163,7 +158,6 @@ export function getAccounts(requestedItemId?: string): Account[] {
 
 /**
  * Update an account.
- * @param db database instance
  * @param accountId
  * @param resourceIn updated account object. accountId property is used to locate.
  * @returns
@@ -186,6 +180,12 @@ export function updateAccount(accountId: string, resourceIn: Account) {
   return 1;
 }
 
+/**
+ * Update an Item.
+ * @param itemId
+ * @param resourceIn
+ * @returns
+ */
 export function updateItem(itemId: string, resourceIn: ServerItem) {
   if (itemId !== resourceIn.itemId) throw new Error("Item ids don't match.");
   const resource: Partial<ServerItem> = { ...resourceIn };
@@ -207,7 +207,7 @@ export function updateItem(itemId: string, resourceIn: ServerItem) {
 
 /**
  * Remove an item from the database.
- * @param itemId itemId of item to delete.
+ * @param itemId
  * @returns
  */
 export function deleteItem(itemId: string) {
@@ -244,10 +244,19 @@ export function getAccountById(accountId: string): Account {
   return results[0];
 }
 
+/**
+ * Add a password salt to the user database.
+ * @param salt
+ */
 export function addSalt(salt: Uint8Array) {
   db.query("REPLACE INTO users (user_id, salt) VALUES(1, ?)", [salt]);
 }
 
+/**
+ * Retrieve password salt from the user database.
+ * @param userId
+ * @returns
+ */
 export function getSalt(userId: number) {
   const [[salt]] = db.query("SELECT salt from users WHERE user_id = ?", [
     userId,
@@ -255,6 +264,9 @@ export function getSalt(userId: number) {
   return salt;
 }
 
+/**
+ * Clear all data in database.
+ */
 export function wipeData() {
   db.query("DELETE from accounts");
   db.query("DELETE from items");

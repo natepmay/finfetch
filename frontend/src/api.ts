@@ -7,6 +7,7 @@ const BASE_BACKEND_URL = "http://localhost:3002";
 
 /**
  * Get all items from database.
+ * @param cryptoKey
  * @returns
  */
 export async function getItems(cryptoKey: CryptoKey): Promise<Item[]> {
@@ -52,7 +53,10 @@ export interface TxnCount {
 }
 
 /**
- * Call the sync endpoint and downloads the file.
+ * Call the sync endpoint and download the file.
+ * @param dateQuery Retrieve transactions since last download ("cursor") or as far back as possible ("all")
+ * @param cryptoKey
+ * @returns Object with counts of added, modified, and deleted transactions.
  */
 export async function downloadWrapper(
   dateQuery: "cursor" | "all",
@@ -110,6 +114,11 @@ export async function deleteItem(itemId: string, cryptoKey: CryptoKey) {
   }
 }
 
+/**
+ * Wipes data and initiates a new user with the given password.
+ * @param password
+ * @returns cryptoKey to add to the app's state.
+ */
 export async function initUser(password: string) {
   const resp = await fetch(`${BASE_BACKEND_URL}/api/users/create`, {
     method: "POST",
@@ -122,6 +131,13 @@ export async function initUser(password: string) {
   return cryptoKey;
 }
 
+/**
+ * Create an access token for an Item and add it to the database. Call on successful completion of a link flow to add an Item.
+ * @param publicToken provided from Plaid for exchange purposes
+ * @param metadata from Plaid
+ * @param cryptoKey
+ * @returns itemId of the item added
+ */
 export async function createAccessToken(
   publicToken: string,
   metadata: PlaidLinkOnSuccessMetadata,
@@ -144,6 +160,10 @@ export async function createAccessToken(
   return data.itemId;
 }
 
+/**
+ * Create a token that allows Plaid Link to open.
+ * @returns
+ */
 export async function createLinkToken() {
   const response = await fetch(BASE_BACKEND_URL + "/api/create_link_token", {
     method: "POST",
@@ -152,6 +172,10 @@ export async function createLinkToken() {
   return link_token;
 }
 
+/**
+ * Retrieve the password salt from the user database.
+ * @returns
+ */
 export async function getSalt() {
   try {
     const saltRaw = await fetch(BASE_BACKEND_URL + "/api/users/1/salt", {
@@ -166,12 +190,18 @@ export async function getSalt() {
   }
 }
 
+/**
+ * Check if the entered password is correct, and return the cryptoKey if so.
+ * @param password
+ * @returns
+ */
 export async function authenticate(password: string) {
   const salt = await getSalt();
 
   const cryptoKey = await deriveKey(password, salt);
 
   try {
+    // will error if decryption fails
     await getItems(cryptoKey);
     return cryptoKey;
   } catch {
@@ -179,6 +209,9 @@ export async function authenticate(password: string) {
   }
 }
 
+/**
+ * Remove all data from the database. This is done implicitly during user initiation, but should be called explicitly when a user runs out of password retries.
+ */
 export async function wipeData() {
   try {
     const res = await fetch(`${BASE_BACKEND_URL}/api/users/1`, {
