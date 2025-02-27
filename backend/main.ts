@@ -2,6 +2,7 @@ import express from "npm:express";
 import type { Request, Response, NextFunction } from "npm:express";
 // Express types are being weird in Deno
 // import { Request, Response, NextFunction } from "npm:@types/express";
+import cors from "npm:cors";
 import bodyParser from "npm:body-parser";
 import {
   Configuration,
@@ -39,6 +40,8 @@ const __dirname = dirname(__filename);
 const frontendDistPath = join(__dirname, "../frontend/dist");
 
 app.use(bodyParser.json());
+// For security reasons, only use CORS during development. It's not needed when serving files from the dist folder.
+app.use(cors());
 
 initDb();
 // TODO don't forget to close the db later
@@ -51,7 +54,7 @@ const PLAID_COUNTRY_CODES = Deno.env
   ?.split(",") as CountryCode[];
 const PLAID_PRODUCTS = Deno.env.get("PLAID_PRODUCTS")?.split(",") as Products[];
 
-console.log("PLAID_CLIENT_ID", PLAID_CLIENT_ID);
+console.log("PLAID_SECRET", PLAID_SECRET);
 
 const configuration = new Configuration({
   basePath: PlaidEnvironments[PLAID_ENV!],
