@@ -47,10 +47,11 @@ initDb();
 const PLAID_CLIENT_ID = Deno.env.get("PLAID_CLIENT_ID");
 const PLAID_SECRET = Deno.env.get("PLAID_SECRET");
 const PLAID_ENV = Deno.env.get("PLAID_ENV");
-const PLAID_COUNTRY_CODES = Deno.env
+const PLAID_COUNTRY_CODES = (Deno.env
   .get("PLAID_COUNTRY_CODES")
-  ?.split(",") as CountryCode[];
-const PLAID_PRODUCTS = Deno.env.get("PLAID_PRODUCTS")?.split(",") as Products[];
+  ?.split(",") || ["US", "CA"]) as CountryCode[];
+const PLAID_PRODUCTS = ["transactions"] as Products[];
+// const PLAID_PRODUCTS = "transactions";
 
 console.log("PLAID_SECRET", PLAID_SECRET);
 
@@ -143,6 +144,7 @@ app.post(
       country_codes: PLAID_COUNTRY_CODES,
       language: "en",
     };
+    console.log("configs ", configs);
     try {
       const createTokenResponse = await client.linkTokenCreate(configs);
       res.json(createTokenResponse.data);
@@ -152,9 +154,8 @@ app.post(
   }
 );
 
-// probably should just be "/api/items"
 app.get(
-  "/api/getItems",
+  "/api/items",
   async function (req: Request, res: Response, next: NextFunction) {
     try {
       const cryptoKeyString = req.get("X-Crypto-Key-String");
@@ -173,15 +174,11 @@ app.get(
   }
 );
 
-app.get(
-  // maybe this should be "/api/items/:itemId/accounts"
-  "/api/getAccounts",
-  function (req: Request, res: Response) {
-    const itemId = req.query.itemId as string;
-    const accounts = getAccounts(itemId);
-    res.json(accounts);
-  }
-);
+app.get("/api/items/:itemId/accounts", function (req: Request, res: Response) {
+  const { itemId } = req.params;
+  const accounts = getAccounts(itemId);
+  res.json(accounts);
+});
 
 app.post(
   "/api/create_access_token",

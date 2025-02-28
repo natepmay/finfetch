@@ -15,7 +15,7 @@ export async function getItems(cryptoKey: CryptoKey): Promise<Item[]> {
 
   console.log("crypto key string client: ", cryptoKeyString);
 
-  const res = await fetch(BASE_BACKEND_URL + "/api/getItems", {
+  const res = await fetch(BASE_BACKEND_URL + "/api/items", {
     headers: {
       "X-Crypto-Key-String": cryptoKeyString,
       "Access-Control-Expose-Headers": "X-Crypto-Key-String",
@@ -36,9 +36,7 @@ export async function getItems(cryptoKey: CryptoKey): Promise<Item[]> {
  * @returns
  */
 export async function getAccounts(itemId: string): Promise<Account[]> {
-  const url = new URL(`${BASE_BACKEND_URL}/api/getAccounts`);
-  url.searchParams.append("itemId", itemId);
-  const res = await fetch(url.toString());
+  const res = await fetch(`${BASE_BACKEND_URL}/api/items/${itemId}/accounts`);
   if (!res.ok) {
     throw new Error("Failed to fetch accounts.");
   }
