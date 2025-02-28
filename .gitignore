@@ -3,3 +3,4 @@ db.db
 .env
 frontend/mockup/node_modules/*
 frontend/mockup/src/output.css
+.DS_Store
