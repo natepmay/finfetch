@@ -25,7 +25,7 @@ Each added transaction contains up to 42 data fields, reliably including
 
 ```bash
 cd finfetch/backend
-deno run --allow-all main.ts
+deno run start
 ```
 
 2. Point your browser to [http://localhost:3002]().
@@ -63,7 +63,7 @@ PLAID_SECRET=
 
 ```bash
 cd backend
-deno run --allow-all main.ts
+deno run start
 ```
 
 9. Open a browser and navigate to [http://localhost:3002/]().
