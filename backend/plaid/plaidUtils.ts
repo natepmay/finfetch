@@ -28,8 +28,10 @@ async function fetchNewSyncData(
     do {
       const results = await client.transactionsSync({
         access_token: item.accessToken,
+        count: 500,
         options: {
           include_original_description: true,
+          days_requested: 730,
         },
         cursor: allData.nextCursor,
       });
