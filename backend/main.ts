@@ -39,7 +39,7 @@ const frontendDistPath = join(__dirname, "../frontend/dist");
 
 app.use(bodyParser.json());
 // For security reasons, only use CORS during development. It's not needed when serving files from the dist folder.
-// app.use(cors());
+app.use(cors());
 
 initDb();
 // TODO don't forget to close the db later

@@ -1,9 +1,9 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 
 import { Button } from "../shared/Button";
 import { Modal } from "../shared/Modal";
 
-import { authenticate, getSalt, wipeData } from "../../api";
+import { authenticate, wipeData } from "../../api";
 
 import { CryptoKeyContext } from "../../context/CryptoKeyContext";
 
@@ -11,9 +11,7 @@ export function Login() {
   const [modalState, setModalState] = useState(
     "hidden" as "hidden" | "wrongPw" | "wiped"
   );
-  const [userStatus, setUserStatus] = useState(
-    "loading" as "loading" | "existent" | "nonexistent"
-  );
+
   const [retries, setRetries] = useState(10);
 
   const { setCryptoKey } = useContext(CryptoKeyContext);
@@ -39,48 +37,26 @@ export function Login() {
     }
   };
 
-  useEffect(() => {
-    let active = true;
-    const getStatus = async () => {
-      try {
-        await getSalt();
-        if (active) setUserStatus("existent");
-      } catch {
-        if (active) setUserStatus("nonexistent");
-      }
-    };
-    getStatus();
-    return () => {
-      active = false;
-    };
-  }, [modalState]);
-
-  const userExists = (
-    <form onSubmit={handleEnterPw} className="flex flex-col">
-      <label htmlFor="password">Enter your password to log in.</label>
-      <input
-        type="password"
-        name="password"
-        id="password"
-        className="border-1 mb-4 border-gray-400"
-      ></input>
-      <Button type="submit" onClick={() => {}}>
-        Log In
-      </Button>
-    </form>
-  );
-
-  const userDoesntExist = (
-    <>
-      <h3>No data found. Click "Start from Scratch" to get started.</h3>
-    </>
-  );
-
   return (
     <>
-      {userStatus === "existent" && userExists}
-
-      {userStatus === "nonexistent" && userDoesntExist}
+      <form onSubmit={handleEnterPw} className="flex flex-col">
+        <label htmlFor="password">Enter your password to log in.</label>
+        <input
+          type="password"
+          name="password"
+          id="password"
+          className="border-1 mb-4 border-gray-400"
+        ></input>
+        <Button type="submit" onClick={() => {}}>
+          Log In
+        </Button>
+        <p className="text-xs mt-2">
+          If you've forgotten your password, 1) delete the file{" "}
+          <code>finfetch/backend/db.db</code>, 2) restart the server, 3) refresh
+          to set a new password, 4) re-add your banks, 5) check in Plaid to make
+          sure you're not being double-charged for any bank connections.{" "}
+        </p>
+      </form>
 
       <Modal
         isOpen={modalState === "wrongPw"}
