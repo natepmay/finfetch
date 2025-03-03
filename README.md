@@ -1,6 +1,6 @@
 # Finfetch
 
-_Download all of your bank and credit card transactions to CSVs in a simple web interface, run locally._
+_Download all of your bank and credit card transactions to CSVs in a simple web interface that runs locally._
 
 Finfetch gives you access to the same transaction data that is used internally by many personal finance apps, including a unified auto-categorization system that works across institutions and accounts. Unlike those apps, though, Finfetch runs locally on your computer, allowing you to process that data in any way you'd like. This is particularly useful for those who use Plain Text Accounting software (Ledger, Beancount, Hledger, etc.), or anyone who prefers to track their income and expenses in spreadsheets.
 
