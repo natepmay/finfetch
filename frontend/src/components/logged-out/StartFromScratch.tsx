@@ -23,8 +23,8 @@ export function StartFromScratch() {
   };
   return (
     <>
-      <p className="mb-4">Reset all data and set a new password.</p>
-      <Button onClick={() => setModalState("init")}>Start from Scratch</Button>
+      <p className="mb-4">Welcome! Set a password to begin.</p>
+      <Button onClick={() => setModalState("init")}>Get Started</Button>
       <Modal
         isOpen={modalState === "init"}
         onClose={() => setModalState("hidden")}

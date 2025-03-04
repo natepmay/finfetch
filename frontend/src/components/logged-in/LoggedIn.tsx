@@ -10,6 +10,7 @@ import { getItems, getAccounts } from "../../api";
 import { DataContext, ItemWithAccounts } from "../../context/DataContext";
 import { RefreshContext } from "../../context/RefreshContext";
 import { CryptoKeyContext } from "../../context/CryptoKeyContext";
+import { ResetPw } from "./ResetPw";
 
 export function LoggedIn() {
   const [appData, setAppData] = useState([] as ItemWithAccounts[]);
@@ -53,6 +54,7 @@ export function LoggedIn() {
           )}
 
           <AddItemButtonArea></AddItemButtonArea>
+          <ResetPw></ResetPw>
         </RefreshContext.Provider>
       </DataContext.Provider>
     </>

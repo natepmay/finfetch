@@ -9,7 +9,7 @@ import { CryptoKeyContext } from "../../context/CryptoKeyContext";
 
 export function Login() {
   const [modalState, setModalState] = useState(
-    "hidden" as "hidden" | "wrongPw" | "wiped"
+    "hidden" as "hidden" | "wrongPw" | "wiped" | "forgotten"
   );
 
   const [retries, setRetries] = useState(10);
@@ -50,12 +50,13 @@ export function Login() {
         <Button type="submit" onClick={() => {}}>
           Log In
         </Button>
-        <p className="text-xs mt-2">
-          If you've forgotten your password, 1) delete the file{" "}
-          <code>finfetch/backend/db.db</code>, 2) restart the server, 3) refresh
-          to set a new password, 4) re-add your banks, 5) check in Plaid to make
-          sure you're not being double-charged for any bank connections.{" "}
-        </p>
+        <button
+          className="text-s mt-2 underline cursor-pointer"
+          onClick={() => setModalState("forgotten")}
+          type="button"
+        >
+          Forgot password?
+        </button>
       </form>
 
       <Modal
@@ -75,9 +76,35 @@ export function Login() {
       >
         <h2 className="font-bold text-lg mb-4">Too Many Retries</h2>
         <h3 className="mb-4">
-          You've entered the wrong password too many times. Your data has been
-          reset, and you may now start from scratch.
+          You've entered the wrong password too many times. Please do the
+          following: 1) delete the file
+          <code>finfetch/backend/db.db</code>, 2) restart the server, 3) refresh
+          to set a new password, 4) re-add your banks, 5) check in Plaid to make
+          sure you're not being double-charged for any bank connections.
         </h3>
+        <Button onClick={() => setModalState("hidden")}>Okay</Button>
+      </Modal>
+
+      <Modal
+        isOpen={modalState === "forgotten"}
+        onClose={() => setModalState("hidden")}
+      >
+        <h2 className="font-bold text-lg mb-4">Forgot Password</h2>
+        <p className="mb-4">
+          If you've forgotten your password,
+          <ol className="list-decimal pl-5 mt-2">
+            <li>
+              delete the file <code>finfetch/backend/db.db</code>
+            </li>
+            <li>restart the server</li>
+            <li>refresh your browser to set a new password</li>
+            <li>re-add your banks</li>
+            <li>
+              check in Plaid to make sure you're not being double-charged for
+              any bank connections.
+            </li>
+          </ol>
+        </p>
         <Button onClick={() => setModalState("hidden")}>Okay</Button>
       </Modal>
     </>
