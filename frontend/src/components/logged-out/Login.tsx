@@ -82,7 +82,7 @@ export function Login() {
           to set a new password, 4) re-add your banks, 5) check in Plaid to make
           sure you're not being double-charged for any bank connections.
         </h3>
-        <Button onClick={() => setModalState("hidden")}>Okay</Button>
+        <Button onClick={() => window.location.reload()}>Okay</Button>
       </Modal>
 
       <Modal
