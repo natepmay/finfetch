@@ -41,9 +41,6 @@ async function fetchNewSyncData(
       allData.removed = allData.removed.concat(newData.removed);
       allData.nextCursor = newData.next_cursor;
       keepGoing = newData.has_more;
-      console.log(
-        `Added: ${newData.added.length} Modified: ${newData.modified.length} Removed: ${newData.removed.length} `
-      );
 
       // if (Math.random() < 0.5) {
       //   throw new Error("SIMULATED PLAID SYNC ERROR");

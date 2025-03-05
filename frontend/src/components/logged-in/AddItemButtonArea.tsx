@@ -21,8 +21,7 @@ export function AddItemButtonArea() {
 
   const onSuccess = useCallback<PlaidLinkOnSuccess>(
     async (publicToken, metadata) => {
-      const itemId = await createAccessToken(publicToken, metadata, cryptoKey!);
-      console.log("itemId returned from API: ", itemId);
+      await createAccessToken(publicToken, metadata, cryptoKey!);
       refreshData();
     },
     [refreshData, cryptoKey]

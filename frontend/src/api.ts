@@ -13,8 +13,6 @@ const BASE_BACKEND_URL = "http://localhost:3002";
 export async function getItems(cryptoKey: CryptoKey): Promise<Item[]> {
   const cryptoKeyString = await exportKey(cryptoKey);
 
-  console.log("crypto key string client: ", cryptoKeyString);
-
   const res = await fetch(BASE_BACKEND_URL + "/api/items", {
     headers: {
       "X-Crypto-Key-String": cryptoKeyString,

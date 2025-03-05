@@ -84,7 +84,10 @@
       ]
     },
     "@std/streams@1.0.9": {
-      "integrity": "a9d26b1988cdd7aa7b1f4b51e1c36c1557f3f252880fa6cc5b9f37078b1a5035"
+      "integrity": "a9d26b1988cdd7aa7b1f4b51e1c36c1557f3f252880fa6cc5b9f37078b1a5035",
+      "dependencies": [
+        "jsr:@std/bytes@^1.0.5"
+      ]
     },
     "@zip-js/zip-js@2.7.57": {
       "integrity": "15465ff627e321775870ad493bc043ca2d97940bda58d709c49908d39f4b0524"

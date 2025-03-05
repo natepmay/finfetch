@@ -25,9 +25,9 @@ export function initDb() {
         iv BLOB
       );
     `);
-    console.log("success!");
+    console.log("Items table created.");
   } catch (_) {
-    console.log("Items is already created :-) or maybe there's an error :-(");
+    console.log("Items table not created (likely already exists).");
     itemsAlreadyCreated = true;
   }
 
@@ -43,11 +43,9 @@ export function initDb() {
           REFERENCES items (item_id)
       );
     `);
-    console.log("success!");
+    console.log("Accounts table created.");
   } catch (_) {
-    console.log(
-      "Accounts is already created :-) or maybe there's an error :-("
-    );
+    console.log("Accounts table not created (likely already exists)");
   }
 
   try {
@@ -57,9 +55,9 @@ export function initDb() {
         salt BLOB NOT NULL
       );
     `);
-    console.log("success!");
+    console.log("Users table created.");
   } catch (_) {
-    console.log("Users is already created :-) or maybe there's an error :-(");
+    console.log("Users is not created (likely already exists).");
   }
 
   if (itemsAlreadyCreated) return;
@@ -115,7 +113,7 @@ export async function getItems(cryptoKey: CryptoKey): Promise<ServerItem[]> {
     return uint8Array.buffer.slice(
       uint8Array.byteOffset,
       uint8Array.byteOffset + uint8Array.byteLength
-    );
+    ) as ArrayBuffer;
   }
 
   for (const [name, itemId, accessTokenEncrypted, iv, cursor] of db.query(
@@ -176,7 +174,6 @@ export function updateAccount(accountId: string, resourceIn: Account) {
 
   db.query(sql, [...values, accountId]);
 
-  // TODO return something that's not this
   return 1;
 }
 
@@ -272,3 +269,9 @@ export function wipeData() {
   db.query("DELETE from items");
   db.query("DELETE from users");
 }
+
+Deno.addSignalListener("SIGINT", () => {
+  db.close();
+  console.log("Database connection closed.");
+  Deno.exit();
+});
