@@ -1,3 +1,5 @@
+![Finfetch app interface](./app_screenshot.png)
+
 # Finfetch
 
 _Download all of your bank and credit card transactions to CSVs in a simple web interface that runs locally._
@@ -35,8 +37,6 @@ deno run start
 ## Setup (First Time Only)
 
 Finfetch is powered by Plaid, a service that connects with banks to retrieve your data. You'll need your own Plaid developer account to use it. **Please note that use of Plaid's API for real-world data requires payment after a limited number of free uses.** See below for pricing.
-
-(TODO: look into availability outside of US and Canada.)
 
 1. Follow the flow on [Plaid's Signup page](https://dashboard.plaid.com/signup) to make an account as a developer. You'll need to give them some information about your app and how you plan to use the API.
 1. Within the Plaid dashboard, apply for production access. This will take a few days, but you can use Finfetch in Sandbox mode in the meantime.
