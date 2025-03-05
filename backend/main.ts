@@ -135,13 +135,16 @@ app.post(
   async function (_: Request, res: Response, next: NextFunction) {
     const configs = {
       user: {
-        // currently hardcoded as "1" with the assumption of only one user
+        // currently hardcoded with the assumption of only one user
         client_user_id: "1",
       },
       client_name: "Finfetch",
       products: PLAID_PRODUCTS,
       country_codes: PLAID_COUNTRY_CODES,
       language: "en",
+      transactions: {
+        days_requested: 730,
+      },
     };
     console.log("configs ", configs);
     try {
