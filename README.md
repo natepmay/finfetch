@@ -29,7 +29,7 @@ deno run start
 ```
 
 2. Point your browser to [http://localhost:3002]().
-1. Login and download your data with one click.
+1. Login and download your latest transactions with one click.
 1. Stop the server (close the terminal window or use the key command for your system).
 
 ## Setup (First Time Only)
@@ -40,6 +40,7 @@ Finfetch is powered by Plaid, a service that connects with banks to retrieve you
 
 1. Follow the flow on [Plaid's Signup page](https://dashboard.plaid.com/signup) to make an account as a developer. You'll need to give them some information about your app and how you plan to use the API.
 1. Within the Plaid dashboard, apply for production access. This will take a few days, but you can use Finfetch in Sandbox mode in the meantime.
+1. [Set the use case](https://dashboard.plaid.com/link/data-transparency-v5) within the Plaid dashboard under Link > Link Customization. The default values are fine.
 1. Clone or download this repo onto your computer.
 1. If you don't have Deno installed, download and install it by running
 
@@ -47,30 +48,37 @@ Finfetch is powered by Plaid, a service that connects with banks to retrieve you
 curl -fsSL https://deno.land/install.sh | sh
 ```
 
-5. Create a file named `.env` within the `backend` directory of Finfetch, and add the following:
+6. Create a file named `.env` within the `backend` directory of Finfetch, and add the following:
 
 ```
 PLAID_CLIENT_ID=
 PLAID_ENV=
 PLAID_SECRET=
+PLAID_COUNTRY_CODES=
 ```
 
-6. Find your API keys in the [Plaid Dashboard](https://dashboard.plaid.com/developers/keys) under Developer > Keys.
-1. In the `.env` file, add the values from your dashboard, with no quotation marks. Keeping in mind the following:
-   1. Possible values for `PLAID_ENV` are `sandbox` or `production`
-   1. Make sure you choose the corresponding secret (sandbox or production) from your dashboard.
-1. Start the Finfetch server by running
+7. Find your API keys in the [Plaid Dashboard](https://dashboard.plaid.com/developers/keys) under Developer > Keys.
+1. In the `.env` file, add the following:
+
+| Variable              | Value(s)                                                                                                                                                                  |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PLAID_CLIENT_ID`     | Client ID listed in your Plaid dashboard                                                                                                                                  |
+| `PLAID_ENV`           | `sandbox` for test data or `production` for real data                                                                                                                     |
+| `PLAID_SECRET`        | The secret listed in your Plaid dashboard. Be sure to use the one that corresponds to your environment (sandbox or production)                                            |
+| `PLAID_COUNTRY_CODES` | Comma separated list of countries in which your banks appear. See [this list](https://plaid.com/docs/api/link/#link-token-create-request-country-codes) Example: `US,CA`. |
+
+9. Start the Finfetch server by running
 
 ```bash
 cd backend
 deno run start
 ```
 
-9. Open a browser and navigate to [http://localhost:3002/]().
+10. Open a browser and navigate to [http://localhost:3002/]().
 
 Within the app, you can now click "Start from Scratch" and follow the prompts to create a password, add your bank accounts, and download your data (if you've been approved for production).
 
-Be sure shut down the server at the end of your session (you can do this by closing the terminal window).
+Be sure to shut down the server at the end of your session (you can do this by closing the terminal window).
 
 ## Pricing
 
@@ -80,7 +88,7 @@ While Finfetch is free and open source, data is provided through Plaid's API whi
 
 Finfetch keeps a small database on your machine with only enough information to 1) authenticate a single user, 2) display your bank names and account "masks" (last four digits of account numbers), 3) request transaction data from Plaid. No transaction data is kept within this database--that lives in the CSVs that you download.
 
-To prevent an attacker with access to your hard drive from gaining API privileges to your accounts, your Plaid access keys are stored in an encrypted form. If you forget your password you'll simply need to reconnect your banks (the app will walk you through this).
+To prevent an attacker with access to your hard drive from gaining API privileges to your accounts, your Plaid access keys are stored in an encrypted form. If you forget your password you can delete the file `db.db` in the `backend` directory, but you'll need to contact Plaid's support if you want to remove these accounts from your billing.
 
 Since Finfetch runs a local server that is only accessible to your machine, others on your network will not be able to access your running process. I've done my best to mitigate the risks of XSS attacks but will be interested to hear from those more well-versed in cybersecurity on whether their are additional measures that can be taken.
 
@@ -99,15 +107,10 @@ deno run dev
 
 4. Install Node modules and start the frontend server:
 
-```
+```bash
 cd frontend
 npm install
 npm run dev
 ```
 
 5. This will run the development server in Vite, which will tell you which port it's running on.
-
-(Plaid info)
-
-Set Plaid Link Use Case:
-https://dashboard.plaid.com/link/data-transparency-v5
