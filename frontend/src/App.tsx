@@ -13,7 +13,7 @@ function App() {
     <div className="bg-gray-100 pb-5 min-h-screen">
       <CryptoKeyContext.Provider value={{ cryptoKey, setCryptoKey }}>
         <Header></Header>
-        {cryptoKey ? <LoggedIn /> : <LoggedOut />}
+        <main>{cryptoKey ? <LoggedIn /> : <LoggedOut />}</main>
       </CryptoKeyContext.Provider>
     </div>
   );
