@@ -1,6 +1,6 @@
-![Finfetch app interface](./app_screenshot.png)
-
 # Finfetch
+
+![Finfetch app interface](./app_screenshot.png)
 
 _Download all of your bank and credit card transactions to CSVs in a simple web interface that runs locally._
 
@@ -25,14 +25,21 @@ Each added transaction contains up to 42 data fields, reliably including
 
 1. In your terminal, start the server by running
 
-```bash
-cd finfetch/backend
-deno run start
-```
+   ```bash
+   cd finfetch/backend
+   deno run start
+   ```
 
-2. Point your browser to [http://localhost:3002]().
-1. Login and download your latest transactions with one click.
-1. Stop the server (close the terminal window or use the key command for your system).
+2. Point your browser to [http://localhost:3002](http://localhost:3002).
+3. Login and download your latest transactions with one click.
+4. Stop the server (close the terminal window or use the key command for your system).
+
+## Workflow Tips
+
+### Hledger
+
+- Set the account's nickname to the account as it appears in your journal, e.g. `assets:bank:capital one`
+- Import the downloaded `added.csv` using a [rules file](https://hledger.org/1.42/hledger.html#csv).
 
 ## Setup (First Time Only)
 
@@ -44,20 +51,20 @@ Finfetch is powered by Plaid, a service that connects with banks to retrieve you
 1. Clone or download this repo onto your computer.
 1. If you don't have Deno installed, download and install it by running
 
-```bash
-curl -fsSL https://deno.land/install.sh | sh
-```
+   ```bash
+   curl -fsSL https://deno.land/install.sh | sh
+   ```
 
-6. Create a file named `.env` within the `backend` directory of Finfetch, and add the following:
+1. Create a file named `.env` within the `backend` directory of Finfetch, and add the following:
 
-```
-PLAID_CLIENT_ID=
-PLAID_ENV=
-PLAID_SECRET=
-PLAID_COUNTRY_CODES=
-```
+   ```text
+   PLAID_CLIENT_ID=
+   PLAID_ENV=
+   PLAID_SECRET=
+   PLAID_COUNTRY_CODES=
+   ```
 
-7. Find your API keys in the [Plaid Dashboard](https://dashboard.plaid.com/developers/keys) under Developer > Keys.
+1. Find your API keys in the [Plaid Dashboard](https://dashboard.plaid.com/developers/keys) under Developer > Keys.
 1. In the `.env` file, add the following:
 
 | Variable              | Value(s)                                                                                                                                                                  |
@@ -69,10 +76,10 @@ PLAID_COUNTRY_CODES=
 
 9. Start the Finfetch server by running
 
-```bash
-cd backend
-deno run start
-```
+   ```bash
+   cd backend
+   deno run start
+   ```
 
 10. Open a browser and navigate to [http://localhost:3002/]().
 
@@ -90,7 +97,16 @@ Finfetch keeps a small database on your machine with only enough information to 
 
 To prevent an attacker with access to your hard drive from gaining API privileges to your accounts, your Plaid access keys are stored in an encrypted form. If you forget your password you can delete the file `db.db` in the `backend` directory, but you'll need to contact Plaid's support if you want to remove these accounts from your billing.
 
-Since Finfetch runs a local server that is only accessible to your machine, others on your network will not be able to access your running process. I've done my best to mitigate the risks of XSS attacks but will be interested to hear from those more well-versed in cybersecurity on whether their are additional measures that can be taken.
+Since Finfetch runs a local server that is only accessible to your machine, others on your network will not be able to access your running process.
+
+To protect your data, don't separate the client and server without changing security practices. If you don't know what that sentence means, you're doing it right.
+
+## Stack
+
+- **Frontend:** React/Tailwind/Vite
+- **Backend:** Deno/Express
+- **Database:** SQLite
+- **Bank Connection API:** Plaid
 
 ## Development
 
@@ -100,17 +116,18 @@ To run in development mode you'll need 1) Node/NPM installed, and 2) to make the
 1. Within `backend/main.ts` uncomment the line `app.use(cors())`. This will allow your frontend and backend to run on different ports and still communicate (not recommended in production mode for security reasons).
 1. Start the backend server:
 
-```bash
-cd backend
-deno run dev
-```
+   ```bash
+   cd backend
+   deno run dev
+   ```
 
-4. Install Node modules and start the frontend server:
+1. Install Node modules and start the frontend server:
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
 
-5. This will run the development server in Vite, which will tell you which port it's running on.
+1. This will run the development server in Vite, which will tell you which port it's running on.
+1. When you need to test with the backend, run `npm build` and switch to the backend server.
