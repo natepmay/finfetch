@@ -321,5 +321,7 @@ app.use((err: Error, _: Request, res: Response, __: NextFunction) => {
 
 // localhost IP set explicitly to prevent access from other devices on the network
 app.listen(port, "127.0.0.1", () => {
-  console.log(`Finfetch listening on port ${port}`);
+  console.log(
+    `Finfetch server is running. Open up http://localhost:${port} . Remember to shut down this server when you're done.`
+  );
 });
