@@ -37,17 +37,26 @@ deno run start
 
 You can export transactions from the command line using the same SQLite database and Plaid credentials as the web app. This does **not** start the HTTP server.
 
-From the `backend` directory:
+The sync logic lives in **Deno** (same code as the backend: SQLite, decryption, Plaid). The **`finfetch` script** is a small **bash** wrapper so you can run `finfetch pull` without typing `deno run`; it handles the interactive password prompt (`read -s`) and invokes Deno with the right flags.
+
+From the repository root (after `chmod +x finfetch` once, or run `bash finfetch pull ...`):
 
 ```bash
-deno task pull -- --output-dir /path/to/exports --range 2y
+./finfetch pull --output-dir /path/to/exports --range 2y
+```
+
+You will be prompted for your Finfetch password (same as the web app). To pass the password non-interactively: `./finfetch pull ... --password 'your-password'`.
+
+Alternatively, from `backend/` without the wrapper:
+
+```bash
+deno task pull -- --output-dir /path/to/exports --range 2y --password 'your-password'
 ```
 
 - **`--output-dir`** — Parent folder. Each run creates a timestamped subfolder (for example `finfetch-2026-04-10T15-30-45`) containing `added.csv`, `removed.csv`, and/or `modified.csv` (only categories that have rows, matching the zip download behavior).
 - **`--range`** — `2y` reloads roughly the last two years (same as choosing “Last 2 years” in the app). `new` fetches only changes since the last successful sync (same as “Since last download”).
-- **Crypto key** — Set `FINFETCH_CRYPTO_KEY_STRING` to the same base64 key string the web client sends as the `X-Crypto-Key-String` header, or pass `--key <string>`. You can copy that value from your browser’s developer tools (Network tab) after triggering a download while logged in.
 
-Requires the same `backend/.env` Plaid variables as the server. Short flags: `-o` for `--output-dir`, `-r` for `--range`, `-k` for `--key`.
+Requires the same `backend/.env` Plaid variables as the server. Short flags: `-o` for `--output-dir`, `-r` for `--range`.
 
 ## Workflow Tips
 

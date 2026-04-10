@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Run from the repo: ./finfetch pull ...
+# Or add this directory to PATH and run: finfetch pull ...
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CLI="$ROOT/backend/cli/pull.ts"
+
+if [[ "${1:-}" != "pull" ]]; then
+  echo "Usage: finfetch pull --output-dir <dir> --range <2y|new> [--password ...]" >&2
+  exit 1
+fi
+
+shift
+
+has_password=false
+for arg in "$@"; do
+  case "$arg" in
+    --password|--password=*)
+      has_password=true
+      break
+      ;;
+  esac
+done
+
+if [[ "$has_password" == true ]]; then
+  exec deno run --allow-all "$CLI" "$@"
+fi
+
+if [[ -t 0 ]]; then
+  read -r -s -p "Password: " PW
+  echo
+  printf '%s\n' "$PW" | exec deno run --allow-all "$CLI" --password-stdin "$@"
+else
+  exec deno run --allow-all "$CLI" --password-stdin "$@"
+fi
