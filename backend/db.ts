@@ -9,26 +9,6 @@ const dbPath = path.resolve(import.meta.dirname || "", "db.db");
 const db = new DB(dbPath);
 db.execute("PRAGMA busy_timeout = 30000");
 
-// #region agent log
-const DEBUG_AGENT_LOG = new URL("../.cursor/debug-f8201e.log", import.meta.url);
-function agentDbLog(
-  location: string,
-  message: string,
-  data: Record<string, unknown>,
-) {
-  const line = JSON.stringify({
-    sessionId: "f8201e",
-    runId: "post-fix",
-    hypothesisId: "H-DB",
-    location,
-    message,
-    data,
-    timestamp: Date.now(),
-  }) + "\n";
-  Deno.writeTextFile(DEBUG_AGENT_LOG, line, { append: true }).catch(() => {});
-}
-// #endregion
-
 /**
  * Create the SQLite tables.
  * @returns
@@ -225,23 +205,12 @@ export function updateItem(itemId: string, resourceIn: ServerItem) {
   const setClause = fields.map((field) => `${field} = ?`).join(", ");
   const sql = `UPDATE items SET ${setClause} WHERE item_id = ?`;
 
-  // #region agent log
-  agentDbLog("db.ts:updateItem:beforeExecute", "about to UPDATE items", {
-    itemId,
-    fieldCount: fields.length,
-  });
-  // #endregion
   const stmt = db.prepareQuery(sql);
   try {
     stmt.execute([...values, itemId]);
   } finally {
     stmt.finalize();
   }
-  // #region agent log
-  agentDbLog("db.ts:updateItem:afterExecute", "UPDATE items finished", {
-    itemId,
-  });
-  // #endregion
 
   // TODO return something that's not this
   return 1;
