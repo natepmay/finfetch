@@ -52,8 +52,6 @@ const PLAID_COUNTRY_CODES = (Deno.env
   ?.split(",") || ["US", "CA"]) as CountryCode[];
 const PLAID_PRODUCTS = ["transactions"] as Products[];
 
-console.log("PLAID_SECRET", PLAID_SECRET);
-
 const configuration = new Configuration({
   basePath: PlaidEnvironments[PLAID_ENV!],
   baseOptions: {
@@ -77,11 +75,11 @@ app.get(
   "/api/sync",
   async (req: Request, res: Response, next: NextFunction) => {
     const cryptoKeyString = req.get("X-Crypto-Key-String");
-    const cryptoKey = await importKey(cryptoKeyString);
+    const cryptoKey = await importKey(cryptoKeyString!);
 
     const items = await getItems(cryptoKey);
 
-    const { dateQuery }: { dateQuery: "cursor" | "all" } = req.query;
+    const { dateQuery } = req.query as { dateQuery: "cursor" | "all" };
 
     try {
       const { csvStrings, txnCount } = await runTransactionSync(
@@ -140,7 +138,7 @@ app.post(
         days_requested: 730,
       },
     };
-    console.log("configs ", configs);
+
     try {
       const createTokenResponse = await client.linkTokenCreate(configs);
       res.json(createTokenResponse.data);
@@ -155,7 +153,7 @@ app.get(
   async function (req: Request, res: Response, next: NextFunction) {
     try {
       const cryptoKeyString = req.get("X-Crypto-Key-String");
-      const cryptoKey = await importKey(cryptoKeyString);
+      const cryptoKey = await importKey(cryptoKeyString!);
 
       const items = await getItems(cryptoKey);
       const itemsFrontend = items.map((item) => ({
@@ -237,7 +235,7 @@ app.delete(
   async function (req: Request, res: Response, next: NextFunction) {
     try {
       const cryptoKeyString = req.get("X-Crypto-Key-String");
-      const cryptoKey = await importKey(cryptoKeyString);
+      const cryptoKey = await importKey(cryptoKeyString!);
 
       const { itemId } = req.params;
 
@@ -317,5 +315,7 @@ app.use((err: Error, _: Request, res: Response, __: NextFunction) => {
 
 // localhost IP set explicitly to prevent access from other devices on the network
 app.listen(port, "127.0.0.1", () => {
-  console.log(`Finfetch listening on port ${port}`);
+  console.log(
+    `Finfetch server is running. Open up http://localhost:${port} . Remember to shut down this server when you're done.`
+  );
 });
