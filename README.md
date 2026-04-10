@@ -45,12 +45,10 @@ From the repository root (after `chmod +x finfetch` once, or run `bash finfetch 
 ./finfetch pull --output-dir /path/to/exports --range 2y
 ```
 
-You will be prompted for your Finfetch password (same as the web app). To pass the password non-interactively: `./finfetch pull ... --password 'your-password'`.
-
-Alternatively, from `backend/` without the wrapper:
+You will be prompted for your Finfetch password (same as the web app). To run non-interactively, pipe the password on stdin:
 
 ```bash
-deno task pull -- --output-dir /path/to/exports --range 2y --password 'your-password'
+printf '%s\n' "$PW" | finfetch pull --output-dir /path/to/exports --range 2y
 ```
 
 - **`--output-dir`** — Parent folder. Each run creates a timestamped subfolder (for example `finfetch-2026-04-10T15-30-45`) containing `added.csv`, `removed.csv`, and/or `modified.csv` (only categories that have rows, matching the zip download behavior).

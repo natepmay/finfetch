@@ -13,12 +13,14 @@ import { runTransactionSync } from "../services/syncService.ts";
 import { deriveKey } from "../utils/crypto.ts";
 
 function usage(): never {
-  console.error(`Usage: finfetch pull --output-dir <dir> --range <2y|new> [--password ...]
+  console.error(`Usage: finfetch pull --output-dir <dir> --range <2y|new>
 
   --output-dir     Parent directory; a timestamped subfolder is created with CSV exports.
   --range          2y = full resync (last ~2 years). new = changes since last download.
-  --password       Your Finfetch password (optional if you use ./finfetch or pipe stdin).
-  --password-stdin Read password from stdin (used by the finfetch script; rarely needed alone).`);
+  
+Password is read from stdin (first line). Use the repo's finfetch wrapper:
+  - Interactive: ./finfetch pull ...
+  - Piped:       printf '%s\n' "$PW" | finfetch pull ...`);
   Deno.exit(1);
 }
 
@@ -54,15 +56,12 @@ async function readPasswordStdin(): Promise<string> {
 }
 
 const args = parseArgs(Deno.args, {
-  string: ["output-dir", "range", "password"],
-  boolean: ["password-stdin"],
+  string: ["output-dir", "range"],
   alias: { o: "output-dir", r: "range" },
 });
 
 const outputDir = args["output-dir"];
 const range = args.range;
-const passwordFlag = args.password;
-const passwordStdin = args["password-stdin"];
 
 if (!outputDir || !range) {
   usage();
@@ -75,16 +74,14 @@ if (range !== "2y" && range !== "new") {
 
 const useCursor = range === "new";
 
-let password = passwordFlag as string | undefined;
-if (!password && passwordStdin) {
-  password = await readPasswordStdin();
-}
-if (!password) {
+if (Deno.stdin.isTerminal()) {
   console.error(
-    "Missing password: pass --password, use --password-stdin, or run ./finfetch pull (prompts).",
+    "Password must be provided via stdin. Use ./finfetch pull (interactive) or pipe: printf '%s\\n' \"$PW\" | finfetch pull ...",
   );
   Deno.exit(1);
 }
+
+const password = await readPasswordStdin();
 
 initDb();
 
