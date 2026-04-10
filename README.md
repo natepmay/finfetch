@@ -35,9 +35,7 @@ deno run start
 
 ## CLI pull (no server)
 
-You can export transactions from the command line using the same SQLite database and Plaid credentials as the web app. This does **not** start the HTTP server.
-
-The sync logic lives in **Deno** (same code as the backend: SQLite, decryption, Plaid). The **`finfetch` script** is a small **bash** wrapper so you can run `finfetch pull` without typing `deno run`; it handles the interactive password prompt (`read -s`) and invokes Deno with the right flags.
+You can download transactions from the command line. This is particularly useful for automated workflows such as cron jobs (e.g. pull your new transactions every few days).
 
 From the repository root (after `chmod +x finfetch` once, or run `bash finfetch pull ...`):
 
@@ -48,7 +46,7 @@ From the repository root (after `chmod +x finfetch` once, or run `bash finfetch 
 You will be prompted for your Finfetch password (same as the web app). To run non-interactively, pipe the password on stdin:
 
 ```bash
-printf '%s\n' "$PW" | finfetch pull --output-dir /path/to/exports --range 2y
+printf '%s\n' "$PW" | ./finfetch pull --output-dir /path/to/exports --range 2y
 ```
 
 - **`--output-dir`** — Parent folder. Each run creates a timestamped subfolder (for example `finfetch-2026-04-10T15-30-45`) containing `added.csv`, `removed.csv`, and/or `modified.csv` (only categories that have rows, matching the zip download behavior).
