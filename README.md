@@ -29,10 +29,33 @@ Each added transaction contains up to 42 data fields, reliably including
 cd finfetch/backend
 deno run start
 ```
+1. Point your browser to [http://localhost:3002](http://localhost:3002).
+2. Login and download your latest transactions with one click.
+3. Stop the server (close the terminal window or use the key command for your system).
 
-2. Point your browser to [http://localhost:3002]().
-1. Login and download your latest transactions with one click.
-1. Stop the server (close the terminal window or use the key command for your system).
+## CLI pull (no server)
+
+You can export transactions from the command line using the same SQLite database and Plaid credentials as the web app. This does **not** start the HTTP server.
+
+From the `backend` directory:
+
+```bash
+deno task pull -- --output-dir /path/to/exports --range 2y
+```
+
+- **`--output-dir`** — Parent folder. Each run creates a timestamped subfolder (for example `finfetch-2026-04-10T15-30-45`) containing `added.csv`, `removed.csv`, and/or `modified.csv` (only categories that have rows, matching the zip download behavior).
+- **`--range`** — `2y` reloads roughly the last two years (same as choosing “Last 2 years” in the app). `new` fetches only changes since the last successful sync (same as “Since last download”).
+- **Crypto key** — Set `FINFETCH_CRYPTO_KEY_STRING` to the same base64 key string the web client sends as the `X-Crypto-Key-String` header, or pass `--key <string>`. You can copy that value from your browser’s developer tools (Network tab) after triggering a download while logged in.
+
+Requires the same `backend/.env` Plaid variables as the server. Short flags: `-o` for `--output-dir`, `-r` for `--range`, `-k` for `--key`.
+
+## Workflow Tips
+
+### Hledger
+
+- Set the account's nickname to the account as it appears in your journal, e.g. `assets:bank:capital one`
+- Import the downloaded `added.csv` using a [rules file](https://hledger.org/1.42/hledger.html#csv).
+>>>>>>> a0ad954 (initial implmementation of cli)
 
 ## Setup (First Time Only)
 

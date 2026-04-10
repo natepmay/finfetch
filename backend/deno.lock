@@ -1,10 +1,11 @@
 {
-  "version": "4",
+  "version": "5",
   "specifiers": {
     "jsr:@std/assert@1": "1.0.8",
     "jsr:@std/assert@^1.0.11": "1.0.11",
     "jsr:@std/bytes@^1.0.3": "1.0.4",
     "jsr:@std/bytes@^1.0.5": "1.0.5",
+    "jsr:@std/cli@*": "1.0.28",
     "jsr:@std/csv@*": "1.0.5",
     "jsr:@std/dotenv@*": "0.225.3",
     "jsr:@std/expect@*": "1.0.13",
@@ -39,6 +40,9 @@
     },
     "@std/bytes@1.0.5": {
       "integrity": "4465dd739d7963d964c809202ebea6d5c6b8e3829ef25c6a224290fbb8a1021e"
+    },
+    "@std/cli@1.0.28": {
+      "integrity": "74ef9b976db59ca6b23a5283469c9072be6276853807a83ec6c7ce412135c70a"
     },
     "@std/csv@1.0.3": {
       "integrity": "623acf0dcb88d62ba727c3611ad005df7f109ede8cac833e3986f540744562e5",
@@ -424,7 +428,8 @@
       ]
     },
     "mime@1.6.0": {
-      "integrity": "sha512-x0Vn8spI+wuJ1O6S7gnbaQg8Pxh4NNHb7KSINmEWKiPE4RKOplvijn+NkmYmmRgP68mc70j2EbeTFRsrswaQeg=="
+      "integrity": "sha512-x0Vn8spI+wuJ1O6S7gnbaQg8Pxh4NNHb7KSINmEWKiPE4RKOplvijn+NkmYmmRgP68mc70j2EbeTFRsrswaQeg==",
+      "bin": true
     },
     "ms@2.0.0": {
       "integrity": "sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A=="

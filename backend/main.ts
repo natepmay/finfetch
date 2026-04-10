@@ -27,7 +27,7 @@ import {
   wipeData,
 } from "./db.ts";
 import { PlaidLinkOnSuccessMetadata } from "./types.ts";
-import { syncTransactions } from "./plaid/plaidUtils.ts";
+import { runTransactionSync } from "./services/syncService.ts";
 import { importKey } from "./utils/crypto.ts";
 
 const app = express();
@@ -84,16 +84,10 @@ app.get(
     const { dateQuery }: { dateQuery: "cursor" | "all" } = req.query;
 
     try {
-      const { csvStrings, txnCount } = await syncTransactions(
+      const { csvStrings, txnCount } = await runTransactionSync(
         client,
         items,
         dateQuery === "cursor"
-      );
-
-      const accounts = getAccounts();
-      const now = Date.now();
-      accounts.forEach((account) =>
-        updateAccount(account.accountId, { ...account, lastDownloaded: now })
       );
 
       const zipFileWriter = new zip.BlobWriter("application/zip");
