@@ -50,7 +50,7 @@ function createPlaidClient(): PlaidApi {
 }
 
 function exportFolderName(): string {
-  const stamp = new Date().toISOString().replace(/:/g, "-").replace(/\..+/, "");
+  const stamp = new Date().toISOString().replace(/:/g, "-").replace(".", "-").replace("Z", "");
   return `finfetch-${stamp}`;
 }
 
