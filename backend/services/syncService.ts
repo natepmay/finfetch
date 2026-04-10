@@ -9,11 +9,13 @@ export async function runTransactionSync(
   client: PlaidApi,
   items: ServerItem[],
   useCursor: boolean,
+  parallelItemSync = true,
 ): Promise<SyncResult> {
   const { csvStrings, txnCount } = await syncTransactions(
     client,
     items,
-    useCursor
+    useCursor,
+    parallelItemSync,
   );
 
   const accounts = getAccounts();

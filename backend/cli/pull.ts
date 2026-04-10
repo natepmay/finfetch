@@ -6,11 +6,16 @@ import {
   PlaidApi,
   PlaidEnvironments,
 } from "npm:plaid";
-import "jsr:@std/dotenv/load";
+import { load } from "jsr:@std/dotenv";
 
 import { initDb, getItems, getSalt } from "../db.ts";
 import { runTransactionSync } from "../services/syncService.ts";
 import { deriveKey } from "../utils/crypto.ts";
+
+await load({
+  envPath: new URL("../.env", import.meta.url),
+  export: true,
+});
 
 function usage(): never {
   console.error(`Usage: finfetch pull --output-dir <dir> --range <2y|new>
@@ -32,6 +37,7 @@ function createPlaidClient(): PlaidApi {
   const configuration = new Configuration({
     basePath: PlaidEnvironments[PLAID_ENV!],
     baseOptions: {
+      timeout: 600_000,
       headers: {
         "PLAID-CLIENT-ID": PLAID_CLIENT_ID,
         "PLAID-SECRET": PLAID_SECRET,
@@ -108,6 +114,7 @@ const { csvStrings, txnCount } = await runTransactionSync(
   client,
   items,
   useCursor,
+  false,
 );
 
 const runDir = join(outputDir, exportFolderName());
