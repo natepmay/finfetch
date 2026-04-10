@@ -25,14 +25,34 @@ Each added transaction contains up to 42 data fields, reliably including
 
 1. In your terminal, start the server by running
 
-   ```bash
-   cd finfetch/backend
-   deno run start
-   ```
+```bash
+cd finfetch/backend
+deno run start
+```
+1. Point your browser to [http://localhost:3002](http://localhost:3002).
+2. Login and download your latest transactions with one click.
+3. Stop the server (close the terminal window or use the key command for your system).
 
-2. Point your browser to [http://localhost:3002](http://localhost:3002).
-3. Login and download your latest transactions with one click.
-4. Stop the server (close the terminal window or use the key command for your system).
+## CLI pull (no server)
+
+You can download transactions from the command line. This is particularly useful for automated workflows such as cron jobs (e.g. pull your new transactions every few days).
+
+From the repository root (after `chmod +x finfetch` once, or run `bash finfetch pull ...`):
+
+```bash
+./finfetch pull --output-dir /path/to/exports --range 2y
+```
+
+You will be prompted for your Finfetch password (same as the web app). To run non-interactively, pipe the password on stdin:
+
+```bash
+printf '%s\n' "$PW" | ./finfetch pull --output-dir /path/to/exports --range 2y
+```
+
+- **`--output-dir`** — Parent folder. Each run creates a timestamped subfolder (for example `finfetch-2026-04-10T15-30-45`) containing `added.csv`, `removed.csv`, and/or `modified.csv` (only categories that have rows, matching the zip download behavior).
+- **`--range`** — `2y` reloads roughly the last two years (same as choosing “Last 2 years” in the app). `new` fetches only changes since the last successful sync (same as “Since last download”).
+
+Requires the same `backend/.env` Plaid variables as the server. Short flags: `-o` for `--output-dir`, `-r` for `--range`.
 
 ## Workflow Tips
 
