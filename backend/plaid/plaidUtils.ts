@@ -1,9 +1,5 @@
 import { RemovedTransaction, Transaction, PlaidApi } from "npm:plaid";
-import {
-  clearAccountNicknameCache,
-  primeAccountNicknameCache,
-  processTransaction,
-} from "./simpleTransactionObject.ts";
+import { processTransaction } from "./simpleTransactionObject.ts";
 import { updateItem } from "../db.ts";
 import { stringify } from "jsr:@std/csv";
 import { ServerItem } from "../../sharedTypes.ts";
@@ -67,88 +63,72 @@ async function fetchNewSyncData(
 export async function syncTransactions(
   client: PlaidApi,
   items: ServerItem[],
-  useCursor: boolean,
-  parallelItemSync = true,
+  useCursor: boolean
 ) {
-  primeAccountNicknameCache();
-  try {
-    const processAllTransactions = (transactions: Transaction[]) => {
-      return transactions.map((transaction: Transaction) => {
-        return processTransaction(transaction);
-      });
-    };
+  const processAllTransactions = (transactions: Transaction[]) => {
+    return transactions.map((transaction: Transaction) => {
+      return processTransaction(transaction);
+    });
+  };
 
-    const syncOne = async (item: ServerItem) => {
+  const eachItemData = await Promise.all(
+    items.map(async (item) => {
       const cursor = useCursor ? item.cursor : "";
       const rawData = await fetchNewSyncData(client, item, cursor);
       updateItem(item.itemId, { ...item, cursor: rawData.nextCursor });
-      const added = processAllTransactions(rawData.added);
-      const modified = processAllTransactions(rawData.modified);
       return {
-        added,
+        added: processAllTransactions(rawData.added),
         removed: rawData.removed,
-        modified,
+        modified: processAllTransactions(rawData.modified),
       };
-    };
+    })
+  );
 
-    const eachItemData = parallelItemSync
-      ? await Promise.all(items.map(syncOne))
-      : await (async () => {
-        const out: Awaited<ReturnType<typeof syncOne>>[] = [];
-        for (const item of items) {
-          out.push(await syncOne(item));
-        }
-        return out;
-      })();
+  type Category = "added" | "removed" | "modified";
 
-    type Category = "added" | "removed" | "modified";
-
-    const combinedData: Record<
-      Category,
-      { [key: string]: string }[] | RemovedTransaction[]
-    > = eachItemData.reduce(
-      (acc, data) => ({
-        added: [...acc.added, ...data.added],
-        removed: [...acc.removed, ...data.removed],
-        modified: [...acc.modified, ...data.modified],
-      }),
-      {
-        added: [],
-        removed: [],
-        modified: [],
-      }
-    );
-
-    const makeCsvString = (
-      dataIn: RemovedTransaction[] | { [key: string]: string }[]
-    ) => {
-      return stringify(dataIn as { [key: string]: string }[], {
-        columns: Object.keys(dataIn[0]),
-      });
-    };
-
-    const txnCount: Record<Category, number> = {
-      added: 0,
-      removed: 0,
-      modified: 0,
-    };
-    const csvStrings: Record<Category, string | null> = {
-      added: null,
-      removed: null,
-      modified: null,
-    };
-
-    for (const category of Object.keys(combinedData) as Category[]) {
-      const thisTxnCount = combinedData[category as Category].length;
-      txnCount[category] = thisTxnCount;
-
-      if (thisTxnCount > 0) {
-        csvStrings[category] = makeCsvString(combinedData[category]);
-      }
+  const combinedData: Record<
+    Category,
+    { [key: string]: string }[] | RemovedTransaction[]
+  > = eachItemData.reduce(
+    (acc, data) => ({
+      added: [...acc.added, ...data.added],
+      removed: [...acc.removed, ...data.removed],
+      modified: [...acc.modified, ...data.modified],
+    }),
+    {
+      added: [],
+      removed: [],
+      modified: [],
     }
+  );
 
-    return { txnCount, csvStrings };
-  } finally {
-    clearAccountNicknameCache();
+  const makeCsvString = (
+    dataIn: RemovedTransaction[] | { [key: string]: string }[]
+  ) => {
+    return stringify(dataIn as { [key: string]: string }[], {
+      columns: Object.keys(dataIn[0]),
+    });
+  };
+
+  const txnCount: Record<Category, number> = {
+    added: 0,
+    removed: 0,
+    modified: 0,
+  };
+  const csvStrings: Record<Category, string | null> = {
+    added: null,
+    removed: null,
+    modified: null,
+  };
+
+  for (const category of Object.keys(combinedData) as Category[]) {
+    const thisTxnCount = combinedData[category as Category].length;
+    txnCount[category] = thisTxnCount;
+
+    if (thisTxnCount > 0) {
+      csvStrings[category] = makeCsvString(combinedData[category]);
+    }
   }
+
+  return { txnCount, csvStrings };
 }

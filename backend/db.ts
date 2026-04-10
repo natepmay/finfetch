@@ -7,7 +7,6 @@ import { encryptData, decryptData } from "./utils/crypto.ts";
 
 const dbPath = path.resolve(import.meta.dirname || "", "db.db");
 const db = new DB(dbPath);
-db.execute("PRAGMA busy_timeout = 30000");
 
 /**
  * Create the SQLite tables.
@@ -173,12 +172,7 @@ export function updateAccount(accountId: string, resourceIn: Account) {
   const setClause = fields.map((field) => `${field} = ?`).join(", ");
   const sql = `UPDATE accounts SET ${setClause} WHERE account_id = ?`;
 
-  const stmt = db.prepareQuery(sql);
-  try {
-    stmt.execute([...values, accountId]);
-  } finally {
-    stmt.finalize();
-  }
+  db.query(sql, [...values, accountId]);
 
   return 1;
 }
@@ -202,12 +196,7 @@ export function updateItem(itemId: string, resourceIn: ServerItem) {
   const setClause = fields.map((field) => `${field} = ?`).join(", ");
   const sql = `UPDATE items SET ${setClause} WHERE item_id = ?`;
 
-  const stmt = db.prepareQuery(sql);
-  try {
-    stmt.execute([...values, itemId]);
-  } finally {
-    stmt.finalize();
-  }
+  db.query(sql, [...values, itemId]);
 
   // TODO return something that's not this
   return 1;

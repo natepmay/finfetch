@@ -114,7 +114,6 @@ const { csvStrings, txnCount } = await runTransactionSync(
   client,
   items,
   useCursor,
-  false,
 );
 
 const runDir = join(outputDir, exportFolderName());

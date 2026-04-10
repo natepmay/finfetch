@@ -1,25 +1,8 @@
 import { Transaction } from "npm:plaid";
 
-import { getAccountById, getAccounts } from "../db.ts";
-
-let accountNicknameById: Map<string, string> | null = null;
-
-export function primeAccountNicknameCache(): void {
-  accountNicknameById = new Map();
-  for (const a of getAccounts()) {
-    accountNicknameById.set(a.accountId, a.nickname ?? a.name);
-  }
-}
-
-export function clearAccountNicknameCache(): void {
-  accountNicknameById = null;
-}
+import { getAccountById } from "../db.ts";
 
 const getNickname = (accountId: string) => {
-  if (accountNicknameById !== null) {
-    const cached = accountNicknameById.get(accountId);
-    if (cached !== undefined) return cached;
-  }
   const account = getAccountById(accountId);
   return account.nickname ?? account.name;
 };
